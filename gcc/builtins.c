@@ -6835,6 +6835,9 @@ fold_builtin_constant_p (tree arg)
   if (TREE_CODE (arg) == ADDR_EXPR)
     {
        tree op = TREE_OPERAND (arg, 0);
+       if (TREE_CODE (op) == VAR_DECL && TREE_STATIC (op)
+	   && targetm.binds_local_p (op))
+	 return integer_one_node;
        if (TREE_CODE (op) == STRING_CST
 	   || (TREE_CODE (op) == ARRAY_REF
 	       && integer_zerop (TREE_OPERAND (op, 1))

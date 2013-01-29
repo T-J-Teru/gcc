@@ -2,7 +2,7 @@
 # Configuration validation subroutine script.
 #   Copyright 1992-2015 Free Software Foundation, Inc.
 
-timestamp='2015-07-28'
+timestamp='2015-11-23'
 
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -658,6 +658,9 @@ case $basic_machine in
 	es1800 | OSE68k | ose68k | ose | OSE)
 		basic_machine=m68k-ericsson
 		os=-ose
+		;;
+	ezchip | arceb-ezchip)
+		basic_machine=arceb-ezchip
 		;;
 	fx2800)
 		basic_machine=i860-alliant

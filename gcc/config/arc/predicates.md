@@ -123,6 +123,8 @@
   int size = GET_MODE_SIZE (GET_MODE (op));
 
   op = XEXP (op, 0);
+  if (TARGET_CMEM && cmem_address (op, SImode))
+    return 0;
   switch (GET_CODE (op))
     {
     case SYMBOL_REF :
@@ -784,3 +786,20 @@
 
 (define_predicate "any_mem_operand"
   (match_code "mem"))
+
+(define_predicate "cmem_address_0"
+  (and (match_code "symbol_ref")
+       (match_test "SYMBOL_REF_FLAGS (op) & SYMBOL_FLAG_CMEM")))
+
+(define_predicate "cmem_address_1"
+  (and (match_code "plus")
+       (match_test "cmem_address_0 (XEXP (op, 0), SImode)")))
+
+(define_predicate "cmem_address_2"
+  (and (match_code "const")
+       (match_test "cmem_address_1 (XEXP (op, 0), SImode)")))
+
+(define_predicate "cmem_address"
+  (ior (match_operand:SI 0 "cmem_address_0")
+       (match_operand:SI 0 "cmem_address_1")
+       (match_operand:SI 0 "cmem_address_2")))

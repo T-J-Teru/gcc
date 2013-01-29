@@ -1279,7 +1279,8 @@ arc_conditional_register_usage (void)
     {
       if (i < 29)
 	{
-	  if (TARGET_Q_CLASS && ((i <= 3) || ((i >= 12) && (i <= 15))))
+	  if ((TARGET_Q_CLASS || TARGET_RRQ_CLASS)
+	      && ((i <= 3) || ((i >= 12) && (i <= 15))))
 	    arc_regno_reg_class[i] = ARCOMPACT16_REGS;
 	  else
 	    arc_regno_reg_class[i] = GENERAL_REGS;
@@ -1296,12 +1297,12 @@ arc_conditional_register_usage (void)
 	arc_regno_reg_class[i] = NO_REGS;
     }
 
-  /* ARCOMPACT16_REGS is empty, if TARGET_Q_CLASS has not been activated.  */
+  /* ARCOMPACT16_REGS is empty, if TARGET_Q_CLASS / TARGET_RRQ_CLASS
+     has not been activated.  */
+  if (!TARGET_Q_CLASS && !TARGET_RRQ_CLASS)
+    CLEAR_HARD_REG_SET(reg_class_contents [ARCOMPACT16_REGS]);
   if (!TARGET_Q_CLASS)
-    {
-      CLEAR_HARD_REG_SET(reg_class_contents [ARCOMPACT16_REGS]);
-      CLEAR_HARD_REG_SET(reg_class_contents [AC16_BASE_REGS]);
-    }
+    CLEAR_HARD_REG_SET(reg_class_contents [AC16_BASE_REGS]);
 
   gcc_assert (FIRST_PSEUDO_REGISTER >= 144);
 
@@ -1674,6 +1675,8 @@ arc_address_cost (rtx addr, machine_mode, addr_space_t, bool speed)
     case LABEL_REF :
     case SYMBOL_REF :
     case CONST :
+      if (TARGET_CMEM && cmem_address (addr, SImode))
+	return 0;
       /* Most likely needs a LIMM.  */
       return COSTS_N_INSNS (1);
 
@@ -2801,12 +2804,15 @@ static int output_scaled = 0;
     'Z': log2(x+1)-1
     'z': log2
     'M': log2(~x)
+    'p': bit Position of lsb
+    's': size of bit field
     '#': condbranch delay slot suffix
     '*': jump delay slot suffix
     '?' : nonjump-insn suffix for conditional execution or short instruction
     '!' : jump / call suffix for conditional execution or short instruction
     '`': fold constant inside unary o-perator, re-recognize, and emit.
     'd'
+    'C': Memory with cm: prefix
     'D'
     'R': Second word
     'S'
@@ -2849,6 +2855,24 @@ arc_print_operand (FILE *file, rtx x, int code)
       else
 	output_operand_lossage ("invalid operand to %%M code");
 
+      return;
+
+    case 'p':
+      if (GET_CODE (x) == CONST_INT)
+	fprintf (file, "%d", exact_log2 (INTVAL (x) & -INTVAL (x)));
+      else
+	output_operand_lossage ("invalid operand to %%p code");
+      return;
+
+    case 's':
+      if (GET_CODE (x) == CONST_INT)
+	{
+	  HOST_WIDE_INT i = INTVAL (x);
+	  HOST_WIDE_INT s = exact_log2 (i & -i);
+	  fprintf (file, "%d", exact_log2 (((0xffffffffUL & i) >> s) + 1));
+	}
+      else
+	output_operand_lossage ("invalid operand to %%s code");
       return;
 
     case '#' :
@@ -3095,6 +3119,16 @@ arc_print_operand (FILE *file, rtx x, int code)
 	}
       else
 	output_operand_lossage ("invalid operand to %%V code");
+      return;
+    case 'C' :
+      if (GET_CODE (x) == MEM)
+	{
+	  fputs ("[cm:", file);
+	  output_address (VOIDmode, XEXP (x, 0));
+	  fputc (']', file);
+	}
+      else
+	output_operand_lossage ("invalid operand to %%C code");
       return;
       /* plt code.  */
     case 'P':
@@ -4125,6 +4159,24 @@ arc_encode_section_info (tree decl, rtx rtl, int first)
 	flags |= SYMBOL_FLAG_SHORT_CALL;
 
       SYMBOL_REF_FLAGS (symbol) = flags;
+    }
+  else if (TREE_CODE (decl) == VAR_DECL)
+    {
+      rtx symbol = XEXP (rtl, 0);
+
+      tree attr = (TREE_TYPE (decl) != error_mark_node
+		   ? DECL_ATTRIBUTES (decl) : NULL_TREE);
+
+      tree sec_attr = lookup_attribute ("section", attr);
+      if (sec_attr)
+	{
+	  const char *sec_name
+	    = TREE_STRING_POINTER (TREE_VALUE (TREE_VALUE (sec_attr)));
+	  if (strcmp (sec_name, ".cmem") == 0
+	      || strcmp (sec_name, ".cmem_shared") == 0
+	      || strcmp (sec_name, ".cmem_private") == 0)
+          SYMBOL_REF_FLAGS (symbol) |= SYMBOL_FLAG_CMEM;
+	}
     }
 }
 
@@ -6999,7 +7051,7 @@ arc_expand_movmem (rtx *operands)
   HOST_WIDE_INT size;
   int align = INTVAL (operands[3]);
   unsigned n_pieces;
-  int piece = align;
+  int piece = STRICT_ALIGNMENT ? align : 4;
   rtx store[2];
   rtx tmpx[2];
   int i;
@@ -7008,7 +7060,7 @@ arc_expand_movmem (rtx *operands)
     return false;
   size = INTVAL (operands[2]);
   /* move_by_pieces_ninsns is static, so we can't use it.  */
-  if (align >= 4)
+  if (align >= 4 || !STRICT_ALIGNMENT)
     n_pieces = (size + 2) / 4U + (size & 1);
   else if (align == 2)
     n_pieces = (size + 1) / 2U;
@@ -9327,6 +9379,31 @@ static bool
 arc_no_speculation_in_delay_slots_p ()
 {
   return true;
+}
+
+/* Implement ROUND_TYPE_ALIGN:
+   Make finalize_type_size behave as if STRICT_ALIGNMENT was still in force,
+   in order to avoid ABI changes relative to the ordinary ARC compiler.  */
+unsigned
+arc_round_type_align (tree type, unsigned computed, unsigned specified)
+{
+  if (!TYPE_PACKED (type)
+      /* Arrays / structs / unions should already have the right alignment
+       * from their elements.  Don't increase alignment just because we can
+       * use a fancy mode now with unaligned loads allowed.  */
+      && TREE_CODE (type) != ARRAY_TYPE
+      && TREE_CODE (type) != RECORD_TYPE
+      && TREE_CODE (type) != UNION_TYPE
+      && TYPE_MODE (type) != BLKmode
+      && TYPE_MODE (type) != VOIDmode)
+    {
+      unsigned mode_align = GET_MODE_ALIGNMENT (TYPE_MODE (type));
+
+      /* I don't believe that this can occur, at least, I've not seen it
+	 happen yet.  */
+      gcc_assert (mode_align <= computed);
+    }
+  return MAX (computed, specified);
 }
 
 struct gcc_target targetm = TARGET_INITIALIZER;
