@@ -410,10 +410,21 @@ if (GET_MODE_CLASS (MODE) == MODE_INT		\
 
 /* Set this nonzero if move instructions will actually fail to work
    when given unaligned data.  */
+#if 1
+/* The ezchip ARC variant supports unaligned access.  Although not without
+   cost, this is still fast enough that we also justify to keep
+   SLOW_UNALIGNED_ACCESS off.  */
+#define STRICT_ALIGNMENT 0
+/* Make finalize_type_size behave as if STRICT_ALIGNMENT was still in force,
+   in order to avoid ABI changes relative to the ordinary ARC compiler.  */
+#define ROUND_TYPE_ALIGN(TYPE, COMPUTED, SPECIFIED) \
+  arc_round_type_align (TYPE, COMPUTED, SPECIFIED)
+#else
 /* On the ARC the lower address bits are masked to 0 as necessary.  The chip
    won't croak when given an unaligned address, but the insn will still fail
    to produce the correct result.  */
 #define STRICT_ALIGNMENT 1
+#endif
 
 /* Layout of source language data types.  */
 

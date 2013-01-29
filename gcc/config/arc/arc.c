@@ -6999,7 +6999,7 @@ arc_expand_movmem (rtx *operands)
   HOST_WIDE_INT size;
   int align = INTVAL (operands[3]);
   unsigned n_pieces;
-  int piece = align;
+  int piece = STRICT_ALIGNMENT ? align : 4;
   rtx store[2];
   rtx tmpx[2];
   int i;
@@ -7008,7 +7008,7 @@ arc_expand_movmem (rtx *operands)
     return false;
   size = INTVAL (operands[2]);
   /* move_by_pieces_ninsns is static, so we can't use it.  */
-  if (align >= 4)
+  if (align >= 4 || !STRICT_ALIGNMENT)
     n_pieces = (size + 2) / 4U + (size & 1);
   else if (align == 2)
     n_pieces = (size + 1) / 2U;
@@ -9327,6 +9327,31 @@ static bool
 arc_no_speculation_in_delay_slots_p ()
 {
   return true;
+}
+
+/* Implement ROUND_TYPE_ALIGN:
+   Make finalize_type_size behave as if STRICT_ALIGNMENT was still in force,
+   in order to avoid ABI changes relative to the ordinary ARC compiler.  */
+unsigned
+arc_round_type_align (tree type, unsigned computed, unsigned specified)
+{
+  if (!TYPE_PACKED (type)
+      /* Arrays / structs / unions should already have the right alignment
+       * from their elements.  Don't increase alignment just because we can
+       * use a fancy mode now with unaligned loads allowed.  */
+      && TREE_CODE (type) != ARRAY_TYPE
+      && TREE_CODE (type) != RECORD_TYPE
+      && TREE_CODE (type) != UNION_TYPE
+      && TYPE_MODE (type) != BLKmode
+      && TYPE_MODE (type) != VOIDmode)
+    {
+      unsigned mode_align = GET_MODE_ALIGNMENT (TYPE_MODE (type));
+
+      /* I don't believe that this can occur, at least, I've not seen it
+	 happen yet.  */
+      gcc_assert (mode_align <= computed);
+    }
+  return MAX (computed, specified);
 }
 
 struct gcc_target targetm = TARGET_INITIALIZER;

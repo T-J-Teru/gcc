@@ -1,0 +1,7 @@
+2013-01-29  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.h [1] (STRICT_ALIGNMENT): Define as 0.
+	[1] (ROUND_TYPE_ALIGN): Define.
+	* config/arc/arc-protos.h (arc_round_type_align): Declare.
+	* config/arc/arc.c (arc_round_type_align): New function.
+	(arc_expand_movmem): Take STRICT_ALIGNMENT into account.
