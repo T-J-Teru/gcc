@@ -1,0 +1,258 @@
+2013-08-17  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.opt (mdecode): New option.
+	* config/arc/arc.h (TARGET_RRQ_CLASS): Also set for TARGET_DECODE.
+	* config/arc/arc.md (decode_p0_plus): Use TARGET_DECODE in pattern
+	condition.
+	(decode_p0, decode_pn_plus, decode_pn, decode_cl): Likewise.
+	(decode_cl_plus): Likewise.
+
+2013-08-10  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config.gcc (arc*-ezchip-*-*) <tm_defines>: Comment out
+	addition of BITOPS_DEFAULT=1 CMEM_DEFAULT=1.
+
+2013-08-09  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.h (SYMBOL_FLAG_CMEM): Define.
+	(CMEM_DEFAULT): Provide default definition.
+	* c-family/c-common.c (handle_section_attribute): Don't set
+	user_defined_section_attribute for VAR_DECL.
+	* config.gcc (arc*-ezchip-elf) <tm_defines>: Add CMEM_DEFAULT=1.
+	(arc*-ezchip-linux-uclibc) <tm_defines>: Likewise.
+	* config/arc/arc.c (arc_address_cost): Return 0 for cmem_address.
+	(arc_print_operand): Recognize 'C' code.
+	(arc_encode_section_info): Set SYMBOL_FLAG_CMEM where indicated.
+	* config/arc/arc.md (movsi_insn): Add r/Ucm,Ucm/c alternatives.
+	* config/arc/arc.opt (mcmem): New option.
+	* config/arc/constraints.md (Ucm): New define_constraint.
+	* config/arc/predicates.md (long_immediate_loadstore_operand):
+	Return 0 for MEM with cmem_address address.
+	(cmem_address_0, cmem_address_1, cmem_address_2): New predicates.
+	(cmem_address): Likewise.
+
+	* config/arc/arc.md (movqi_insn): Add r/Ucm,Ucm/c alternatives.
+	(movhi_insn): Likewise.
+
+	* config/arc/constraints.md (Usd, Us<, Us>): Use define_constraint.
+
+	* config/arc/arc.md (movqi_insn) <r/Ucm,Ucm/c alternatives>: Add
+	C modifier to memory operand in output templates.
+	(movhi_insn) <r/Ucm,Ucm/c alternatives>: Likewise.
+
+2013-08-08  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	embecosm bug 157
+	* builtins.c (fold_builtin_constant_p):
+	Don't consider addresses for global variables as constant unless
+	the variable in questions is bound locally.
+	gcc/testsuite:
+	* gcc.c-torture/execute/20130418-2.c: Revert expected value.
+
+2013-08-04  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movsi_insn): Update EZchip instruction names.
+	(tst_movb_i, tst_bitfield, andsi3_i, extzv_i, insv_i): Likewise.
+	(movb_i, movb_i_signed, movb_i_high, *movb_i_high_signed): Likewise.
+	(mrgb_i, decode_i_p0_plus, decode_i_p0, decode_i_pn_plus): Likewise.
+	(decode_i_pn, decode_i_cl, decode_i_cl_plus): Likewise.
+	(tst_movb_i, movb_i, movb_i_signed, movb_i_high): Rename to ..
+	(tst_movb, movb, movb_signed, movb_high): .. this.
+	(movb_i_high_signed, mrgb_i, decode_i_p0_plus): Rename to ..
+	(movb_high_signed, mrgb, decode_p0_plus): .. this.
+	(decode_i_p0, decode_i_pn_plus, decode_i_pn): Rename to ..
+	(decode_p0, decode_pn_plus, decode_pn): .. this.
+	(decode_i_cl, decode_i_cl_plus): Rename to ..
+	(decode_i_cl, decode_i_cl_plus): .. this.
+	* config/arc/arc.c (arc_decode_i_p_size): Rename to ..
+	(arc_decode_p_size): .. this.  Changed all callers.
+	(arc_decode_i_size): Rename to ..
+	(arc_decode_size): .. this.  Changed all callers.
+	* config/arc/arc-protos.h (arc_decode_p_size, arc_decode_size):
+	Update name in prototype.
+
+	* config/arc/arc.md (movsi_insn): Use .cl suffix for movl / movh.
+
+2013-08-03  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movsi_insn): Add cpu_facility
+	attr alternative "*" for w/Clo and w/Chi.
+
+2013-04-18  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	embecosm bug 157
+	gcc:
+	* builtins.c (fold_builtin_constant_p):
+	Consider addresses for global/static variables as constant.
+	gcc/testsuite:
+	* gcc.c-torture/execute/20130418-1.c: New test.
+	* gcc.c-torture/execute/20130418-2.c: Likewise.
+	* gcc.c-torture/execute/20130418-3.c: Likewise.
+	* gcc.c-torture/execute/20130418-4.c: Likewise.
+
+2013-04-04  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.c (arc_expand_movmem): Take STRICT_ALIGNMENT
+	into account when calculating n_pieces.
+
+2013-03-12  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (decode_i_cl): Remove size from output pattern.
+	(decode_i_cl_plus): Likewise.
+
+2013-03-12  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc-protos.h (arc_decode_i_size): Declare.
+	(arc_decode_i_p_size): Likewise.
+	* config/arc/arc.c (arc_print_operand) <z>: Check for -0x80000000.
+	(arc_decode_i_p_size, arc_decode_i_size): New functions.
+	* config/arc/arc.md (decode_i_p0_plus, decode_i_p0): New patterns.
+	(decode_i_pn_plus, decode_i_pn, decode_i_cl): Likewise.
+	(decode_i_cl_plus): Likewise.
+
+2013-03-11  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/t-ezchip: New file.
+	config.gcc (arc-*-elf*, arc*-*-linux-uclibc*) <arc*-ezchip-*>:
+	Add arc/t-ezchip to tmake_file.
+
+2013-03-11  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movsi_insn) <Rrq/Cbi>: Change to w/Cbi.
+	(insv_i) <Rrq/C18/n/P>: Change to w/C18/n/P.
+
+2013-03-11  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.c (arc_print_operand) <H/L>: Fix behaviour for
+	hosts with long wider than 64 bit / differently sized HOST_WIDE_INT.
+
+2013-03-08  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movsi_insn) <Chi/w>: Output unsigned
+	hexadecimal constant.
+
+2013-03-05  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movsi_insn) <Cbi/Rrq>: Fix decision when we
+	are only setting the top byte.  When setting the top byte,
+	output unsigned hexadecimal constant.
+	* config/arc/constraints.md (Chi): Make behaviour independent of
+	HOST_WIDE_INT size.
+
+2013-03-04  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.c (arc_round_type_align): Also avoid effect when
+	handling union types.
+
+2013-02-19  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.c (arc_print_operand) <'s'>): Strip off sign
+	when calculating mask.
+
+	* config/arc/arc.md (movsi_insn) <Rrq/Cbi>: Limit position to 24.
+
+	* config/arc/arc.md (andsi_i) <Rrq/c/Cbf>: Change second constraint
+	to Rrq.
+
+	* config.gcc (arc-*-elf*, arc*-*-linux-uclibc*): Set BITOPS_DEFAULT=1
+	for ezchip.
+	* config/arc/arc.h (UNALIGNED_ACCESS_DEFAULT, BITOPS_DEFAULT):
+	Provide default as 0.
+	(STRICT_ALIGNMENT): Use unaligned_access.
+	* config/arc/arc.opt (mbitops): Use BITOPS_DEFAULT.
+	(munaligned-access): New option.
+
+	* config/arc/constraints.md (Clo, Chi): New constraints.
+	* config/arc/arc.md (movsi_insn): New alternatives w/Clo and w/Chi.
+
+	* config/arc/constraints.md (Chs, Cbn): New constraints.
+	* config/arc/arc.md (tst_movb_i, tst_bitfield_tst): New patterns.
+	(tst_bitfield_asr, tst_bitfield): Likewise.
+	(tst): Avoid recognition if it could prevent test_movb_i combination.
+	Replace c/CnL with c/Chs alternative.
+
+	* config/arc/arc.md (mrgb_i+1, mrgb_i+2): Remove constraints.
+
+	* config/arc/arc.c (arc_round_type_align): Avoid effect when
+	computed size agrees with mode, or when handling array/record types.
+	Abort when still a change seems indicated.
+
+	* config/arc/arc.md (extzv): Now a define_expand.
+	(extzv_i): New pattern.
+
+2013-02-18  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (insv_i) <Rrq/C18/n>: Remove spurious
+	SRC2_POS from template.
+
+	* config/arc/arc.md (mbrb_i): Fix short output template
+	to adjust known unalignment.
+
+	* config/arc/arc.md (insv_i) <Rrq/n/n/r>: Fix last constraint to be
+	Rrq too.
+
+	* config/arc/arc.md (movb_i_high_signed+1):
+	New combine-splitter pattern.
+
+	* config/arc/arc.c (arc_expand_movmem): Take STRICT_ALIGNMENT
+	into account.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (mrgb_i, mrgb_i+1, mrgb_i+2): New patterns.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.h (enum reg_class): Remove ARCOMPACT16_REQ_REGS.
+	(REG_CLASS_NAMES, REG_CLASS_CONTENTS): Likewise.
+	* gcc/config/arc/arc.c (arc_conditional_register_usage):
+	Merge ARCOMPACT16_REGS and ARCOMPACT16_REQ_REGS.
+	* config/arc/constraints.md (q, Rrq): Make class conditional,
+	ARCOMPACT16_REGS or NO_REGS.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.h (TARGET_RRQ_CLASS): Define.
+	(enum reg_class): Add ARCOMPACT16_REQ_REGS.
+	(REG_CLASS_NAMES, REG_CLASS_CONTENTS): Likewise.
+	* config/arc/arc.c (arc_conditional_register_usage):
+	Take TARGET_RRQ_CLASS / ARCOMPACT16_REQ_REGS into account.
+	* config/arc/constraints.md (Rrq): New constraint.
+	* config/arc/arc.md (extzv, insv_i, movb_i): Use Rrq constraint.
+	(movb_i_signed, movb_i_high, movb_i_high_signed): Likewise.
+	(movsi_insn) <w/Cbi>: Likewise.
+	(andsi3_i) <w/Cbf>: Likewise.  Set type to shift.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movb_i_signed, movb_i_high): New patterns.
+	(movb_i_high_signed): Likewise.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movsi_insn) <iw/Crr,w/Cbi>: Set type to shift.
+	(extzv, insv_i): Likewise.
+	(movb_i): New pattern.
+
+2013-02-15  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movsi_insn) <w/Cbi>: Remove position masking.
+	* config/arc/constraints.md: (Cbi): Fix 64 bit issue with 'signed'
+	values.
+
+2013-02-15  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.c (arc_print_operand): Add directives 'p' and 's'.
+	* config/arc/arc.h (IS_POWEROF2_OR_0_P): Define.
+	* config/arc/arc.md (movsi_insn): Add w/Cbi alternative.
+	(andsi3_i): Add w/c/Cbf alternative.
+	(extzv, insv, insv_i): New patterns.
+	* config/arc/arc.opt (TARGET_BITOPS): New option.
+	* config/arc/constraints.md (Cbf, C18, Cbi): New constraints.
+
+2013-01-29  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.h [1] (STRICT_ALIGNMENT): Define as 0.
+	[1] (ROUND_TYPE_ALIGN): Define.
+	* config/arc/arc-protos.h (arc_round_type_align): Declare.
+	* config/arc/arc.c (arc_round_type_align): New function.

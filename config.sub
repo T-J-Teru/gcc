@@ -1,6 +1,7 @@
 #! /bin/sh
 # Configuration validation subroutine script.
 #   Copyright 1992-2013 Free Software Foundation, Inc.
+#   Copyright (C) 2013 Embecosm Limited
 
 timestamp='2013-10-01'
 
@@ -642,6 +643,9 @@ case $basic_machine in
 	es1800 | OSE68k | ose68k | ose | OSE)
 		basic_machine=m68k-ericsson
 		os=-ose
+		;;
+	ezchip | arceb-ezchip)
+		basic_machine=arceb-ezchip
 		;;
 	fx2800)
 		basic_machine=i860-alliant

@@ -1,0 +1,110 @@
+2013-08-17  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/decode_i-1.c: Update dg-options.
+	* gcc.target/arc/decode_i-2.c, gcc.target/arc/decode_i-3.c: Likewise.
+	* gcc.target/arc/decode_i-4.c, gcc.target/arc/decode_i-5.c: Likewise.
+	* gcc.target/arc/decode_i-6.c: Likewise.
+	* gcc.target/arc/decode_i_cl-1.c: Likewise.
+	* gcc.target/arc/decode_i_cl-2.c: Likewise.
+	* gcc.target/arc/decode_i_cl-3.c: Likewise.
+	* gcc.target/arc/decode_i_cl-4.c: Likewise.
+	* gcc.target/arc/decode_i_cl-5.c: Likewise.
+
+2013-08-09  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/decode_i-1.c: Updated expected pattern(s).
+	* gcc.target/arc/decode_i-2.c: Likewise.
+	* gcc.target/arc/decode_i-3.c: Likewise.
+	* gcc.target/arc/decode_i-4.c: Likewise.
+	* gcc.target/arc/decode_i-5.c: Likewise.
+	* gcc.target/arc/decode_i-6.c: Likewise.
+	* gcc.target/arc/decode_i_cl-1.c: Likewise.
+	* gcc.target/arc/decode_i_cl-2.c: Likewise.
+	* gcc.target/arc/decode_i_cl-3.c: Likewise.
+	* gcc.target/arc/decode_i_cl-4.c: Likewise.
+	* gcc.target/arc/decode_i_cl-5.c: Likewise.
+	* gcc.target/arc/extzv-1.c: Likewise.
+	* gcc.target/arc/insv-1.c: Likewise.
+	* gcc.target/arc/insv-2.c: Likewise.
+	* gcc.target/arc/movb_i-1.c: Likewise.
+	* gcc.target/arc/movb_i-2.c: Likewise.
+	* gcc.target/arc/movb_i-3.c: Likewise.
+	* gcc.target/arc/movb_i-4.c: Likewise.
+	* gcc.target/arc/movb_i-5.c: Likewise.
+	* gcc.target/arc/movb_i_cl-1.c: Likewise.
+	* gcc.target/arc/movb_i_cl-2.c: Likewise.
+	* gcc.target/arc/movbi_i_cl-1.c: Likewise.
+	* gcc.target/arc/movl_i-1.c: Likewise.
+	* gcc.target/arc/mrgb_i-1.c: Likewise.
+
+	* gcc.target/arc/xld.c: New file.
+
+2013-04-18  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.c-torture/execute/20130418-1.c: New test.
+	* gcc.c-torture/execute/20130418-2.c: Likewise.
+	* gcc.c-torture/execute/20130418-3.c: Likewise.
+	* gcc.c-torture/execute/20130418-4.c: Likewise.
+
+2013-04-04  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/setmem-1.c: New file.
+
+	* gcc.target/arc/setmem-2.c, gcc.target/arc/setmem-3.c: New files.
+	* gcc.target/arc/setmem-4.c: Likewise.
+
+	* gcc.target/arc/setmem-2.c (scan-assembler-not "memcpy"): Remove xfail.
+	* gcc.target/arc/setmem-3.c (scan-assembler-not "memcpy"): Add.
+	* gcc.target/arc/setmem-4.c (scan-assembler-not "memcpy"): Likewise.
+
+	* gcc.target/arc/setmem-2.c (scan-assembler-not "rodata"): Add as xfail.
+
+2013-03-12  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/decode_i-1.c, gcc.target/arc/decode_i-2.c: New files.
+	* gcc.target/arc/decode_i-3.c, gcc.target/arc/decode_i-4.c: Likewise.
+	* gcc.target/arc/decode_i-5.c, gcc.target/arc/decode_i-6.c: Likewise.
+	* gcc.target/arc/decode_i_cl-1.c: Likewise.
+	* gcc.target/arc/decode_i_cl-2.c: Likewise.
+	* gcc.target/arc/decode_i_cl-3.c: Likewise.
+	* gcc.target/arc/decode_i_cl-4.c: Likewise.
+	* gcc.target/arc/decode_i_cl-5.c: Likewise.
+
+2013-02-19  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/movl_i-1.c: New file.
+
+	* gcc.target/arc/movb_i_cl-2.c: New file.
+
+2013-02-18  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/movb_i-1.c: Provide different bit positions for
+	big endian.
+	* gcc.target/arc/movb_i-2.c, gcc.target/arc/movb_i-3.c: Likewise.
+	* gcc.target/arc/movb_i-4.c, gcc.target/arc/movb_i-5.c: Likewise.
+	* gcc.target/arc/mrgb_i-1.c: Likewise.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/mrgb_i-1.c: New file.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/movb_i-1.c: Tighten register match patterns.
+	* gcc.target/arc/movb_i-2.c, gcc.target/arc/movb_i-3.c: Likewise.
+	* gcc.target/arc/movb_i-4.c, gcc.target/arc/movb_i-5.c: Likewise.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/movb_i-2.c, gcc.target/arc/movb_i-3.c: New files.
+	* gcc.target/arc/movb_i-4.c, gcc.target/arc/movb_i-5.c: Likewise.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/movb_i-1.c: New file.
+
+2013-02-15  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/movb_i_cl-1.c: New file.
+	* gcc.target/arc/movbi_i_cl-1.c, gcc.target/arc/extzv-1.c: Likewise.
+	* gcc.target/arc/insv-1.c, gcc.target/arc/insv-2.c: Likewise.

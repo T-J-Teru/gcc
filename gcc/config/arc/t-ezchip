@@ -1,0 +1,3 @@
+#Fixme: when upgrading to gcc 4.8 or later, should evaluate if we can use
+#new multilib facilities in config.gcc .
+MULTILIB_OPTIONS=munaligned-access

@@ -1,6 +1,8 @@
 /* Definitions of target machine for GNU compiler, Synopsys DesignWare ARC cpu.
    Copyright (C) 2000, 2007-2013 Free Software Foundation, Inc.
 
+   Copyright 2013 Embecosm Limited
+
 This file is part of GCC.
 
 GCC is free software; you can redistribute it and/or modify
@@ -123,6 +125,11 @@ extern void arc_dump_stack_info (FILE *stream, const char *name);
 extern void arc_init_cumulative_args (CUMULATIVE_ARGS *, tree, rtx, tree, int);
 extern void arc_split_compare_and_swap (rtx *);
 extern void arc_expand_compare_and_swap (rtx *);
+
+extern unsigned arc_round_type_align (tree type, unsigned computed,
+				      unsigned specified);
+extern int arc_decode_size (rtx mask, rtx shift);
+extern int arc_decode_p_size (rtx mask, rtx shift);
 
 #ifdef  RTX_CODE
 extern void arc_expand_atomic_op (enum rtx_code, rtx, rtx, rtx, rtx, rtx);

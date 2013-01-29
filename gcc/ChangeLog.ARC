@@ -1269,6 +1269,14 @@
 
 2013-08-31  Joern Rennecke  <joern.rennecke@embecosm.com>
 
+	* config/arc/arc.md (zero_extendqihi2_i): Add r/Ucm alternative.
+	(zero_extendqisi2_ac, zero_extendhisi2_i): Likewise.
+	(extendqihi2_i, extendqisi2_ac, extendhisi2_i): Add r/Uex alternative.
+	Set length of r/m alernative to 8.
+	* config/arc/constraints.md (Uex): New memory constraint.
+
+2013-08-31  Joern Rennecke  <joern.rennecke@embecosm.com>
+
 	* testsuite/gcc.target/arc/cond-set-use.c: New test.
 
 2013-08-30 Claudiu Zissulescu <claziss@synopsys.com>

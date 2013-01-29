@@ -1,6 +1,7 @@
 ; Options for the Synopsys DesignWare ARC port of the compiler
 ;
 ; Copyright (C) 2005, 2007-2012 Free Software Foundation, Inc.
+; Copyright 2013 Embecosm Limited
 ;
 ; This file is part of GCC.
 ;
@@ -514,3 +515,19 @@ Specify thread pointer register number
 
 mtp-regno=none
 Target RejectNegative Var(arc_tp_regno,-1)
+
+mbitops
+Target Report Var(TARGET_BITOPS) Init(BITOPS_DEFAULT)
+Enable use of EZchip bit operations
+
+mcmem
+Target Report Var(TARGET_CMEM) Init(CMEM_DEFAULT)
+Enable use of EZchip xld/xst extension
+
+mdecode
+Target Report Var(TARGET_DECODE)
+Enable use of EZchip decode extension instruction
+
+munaligned-access
+Target Report Var(unaligned_access) Init(UNALIGNED_ACCESS_DEFAULT)
+Enable unaligned word and halfword accesses to packed data.

@@ -2,6 +2,8 @@
    Copyright (C) 1994, 1995, 1997, 1998, 2007-2013
    Free Software Foundation, Inc.
 
+   Copyright 2013 Embecosm Limited
+
    Sources derived from work done by Sankhya Technologies (www.sankhya.com) on
    behalf of Synopsys Inc.
 
@@ -51,6 +53,7 @@ along with GCC; see the file COPYING3.  If not see
 #define SYMBOL_FLAG_MEDIUM_CALL	(SYMBOL_FLAG_MACH_DEP << 1)
 #define SYMBOL_FLAG_LONG_CALL	(SYMBOL_FLAG_MACH_DEP << 2)
 #define SYMBOL_FLAG_TLS_S9	(SYMBOL_FLAG_MACH_DEP << 3)
+#define SYMBOL_FLAG_CMEM	(SYMBOL_FLAG_MACH_DEP << 4)
 
 /* Check if this symbol has a long_call attribute in its declaration */
 #define SYMBOL_REF_LONG_CALL_P(X)	\
@@ -365,6 +368,19 @@ ASM_DEFOPT "%{matomic:-mlock} \
 #endif
 #endif
 
+#ifndef UNALIGNED_ACCESS_DEFAULT
+#define UNALIGNED_ACCESS_DEFAULT 0
+#endif
+
+#ifndef BITOPS_DEFAULT
+#define BITOPS_DEFAULT 0
+#endif
+#ifndef CMEM_DEFAULT
+#define CMEM_DEFAULT 0
+#endif
+
+#define TARGET_RRQ_CLASS (TARGET_BITOPS || TARGET_DECODE)
+
 /* Target machine storage layout.  */
 
 /* We want zero_extract to mean the same
@@ -473,12 +489,16 @@ if (GET_MODE_CLASS (MODE) == MODE_INT		\
    && arc_size_opt_level < 3			\
    && (ALIGN) < FASTEST_ALIGNMENT ? FASTEST_ALIGNMENT : (ALIGN))
 
+/* The ezchip ARC variant supports unaligned access.  Although not without
+   cost, this is still fast enough that we also justify to keep
+   SLOW_UNALIGNED_ACCESS off.  */
 /* Set this nonzero if move instructions will actually fail to work
    when given unaligned data.  */
-/* On the ARC the lower address bits are masked to 0 as necessary.  The chip
-   won't croak when given an unaligned address, but the insn will still fail
-   to produce the correct result.  */
-#define STRICT_ALIGNMENT 1
+#define STRICT_ALIGNMENT (!unaligned_access)
+/* Make finalize_type_size behave as if STRICT_ALIGNMENT was still in force,
+   in order to avoid ABI changes relative to the ordinary ARC compiler.  */
+#define ROUND_TYPE_ALIGN(TYPE, COMPUTED, SPECIFIED) \
+  arc_round_type_align (TYPE, COMPUTED, SPECIFIED)
 
 /* Layout of source language data types.  */
 
@@ -1094,6 +1114,7 @@ extern int arc_initial_elimination_offset(int from, int to);
 
 /* Is the argument a const_int rtx, containing an exact power of 2 */
 #define  IS_POWEROF2_P(X) (! ( (X) & ((X) - 1)) && (X))
+#define  IS_POWEROF2_OR_0_P(X) (! ( (X) & ((X) - 1)))
 
 /* A C compound statement that attempts to replace X, which is an address
    that needs reloading, with a valid memory address for an operand of
