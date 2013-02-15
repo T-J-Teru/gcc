@@ -2801,6 +2801,8 @@ static int output_scaled = 0;
     'Z': log2(x+1)-1
     'z': log2
     'M': log2(~x)
+    'p': bit Position of lsb
+    's': size of bit field
     '#': condbranch delay slot suffix
     '*': jump delay slot suffix
     '?' : nonjump-insn suffix for conditional execution or short instruction
@@ -2849,6 +2851,24 @@ arc_print_operand (FILE *file, rtx x, int code)
       else
 	output_operand_lossage ("invalid operand to %%M code");
 
+      return;
+
+    case 'p':
+      if (GET_CODE (x) == CONST_INT)
+	fprintf (file, "%d", exact_log2 (INTVAL (x) & -INTVAL (x)));
+      else
+	output_operand_lossage ("invalid operand to %%p code");
+      return;
+
+    case 's':
+      if (GET_CODE (x) == CONST_INT)
+	{
+	  HOST_WIDE_INT i = INTVAL (x);
+	  HOST_WIDE_INT s = exact_log2 (i & -i);
+	  fprintf (file, "%d", exact_log2 (((0xffffffffUL & i) >> s) + 1));
+	}
+      else
+	output_operand_lossage ("invalid operand to %%s code");
       return;
 
     case '#' :

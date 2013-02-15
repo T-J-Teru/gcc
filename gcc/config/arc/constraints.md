@@ -236,11 +236,31 @@
   (and (match_code "const_int")
        (match_test "ival == 0xff || ival == 0xffff")))
 
+(define_constraint "Cbf"
+ "@internal
+  a mask for a bit field"
+  (and (match_code "const_int")
+       (match_test "TARGET_BITOPS && IS_POWEROF2_OR_0_P (ival + (ival & -ival))")))
+
+(define_constraint "C18"
+ "@internal
+  1,2,4 or 8"
+  (and (match_code "const_int")
+       (match_test "ival == 1 || ival == 2 || ival == 4 || ival == 8")))
+
 (define_constraint "Crr"
  "@internal
   constant that can be loaded with ror b,u6"
   (and (match_code "const_int")
        (match_test "(ival & ~0x8000001f) == 0 && !arc_ccfsm_cond_exec_p ()")))
+
+(define_constraint "Cbi"
+ "@internal
+  constant that can be loaded with movbi.cl"
+  (and (match_code "const_int")
+       (match_test "TARGET_BITOPS")
+       (match_test "!ival
+		    || (unsigned)ival >> exact_log2 (ival & -ival) <= 0xff")))
 
 ;; Floating-point constraints
 

@@ -1,3 +1,18 @@
+2013-02-19  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.c (arc_print_operand) <'s'>): Strip off sign
+	when calculating mask.
+
+2013-02-15  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.c (arc_print_operand): Add directives 'p' and 's'.
+	* config/arc/arc.h (IS_POWEROF2_OR_0_P): Define.
+	* config/arc/arc.md (movsi_insn): Add w/Cbi alternative.
+	(andsi3_i): Add w/c/Cbf alternative.
+	(extzv, insv, insv_i): New patterns.
+	* config/arc/arc.opt (TARGET_BITOPS): New option.
+	* config/arc/constraints.md (Cbf, C18, Cbi): New constraints.
+
 2013-01-29  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config/arc/arc.h [1] (STRICT_ALIGNMENT): Define as 0.
