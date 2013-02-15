@@ -1,3 +1,11 @@
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movsi_insn <iw/Crr,w/Cbi>): Set type to shift.
+	(extzv, insv_i): Likewise.
+	(movb_i): New pattern.
+	* config/arc/constraints.md: (Cbi): Fix 64 bit issue with 'signed'
+	values.
+
 2013-02-19  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config/arc/arc.c (arc_print_operand) <'s'>): Strip off sign

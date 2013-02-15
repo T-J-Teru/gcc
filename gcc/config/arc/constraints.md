@@ -260,7 +260,8 @@
   (and (match_code "const_int")
        (match_test "TARGET_BITOPS")
        (match_test "!ival
-		    || (unsigned)ival >> exact_log2 (ival & -ival) <= 0xff")))
+		    || ((ival & 0xffffffffUL) >> exact_log2 (ival & -ival)
+			<= 0xff)")))
 
 ;; Floating-point constraints
 

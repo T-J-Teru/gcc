@@ -5630,7 +5630,9 @@
 			 (match_operand:SI 2 "const_int_operand" "n")
 			 (match_operand:SI 3 "const_int_operand" "n")))]
   "TARGET_BITOPS"
-  "movb.cl %0,%1,0,%3,%2")
+  "movb.cl %0,%1,0,%3,%2"
+  [(set_attr "type" "shift")
+   (set_attr "length" "4")])
 
 (define_expand "insv"
   [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "")
@@ -5656,7 +5658,20 @@
   "@
    movbi %0,%0,%3,%2,%1
    movb %0,%0,%3,%2,0,%1"
-  [(set_attr "length" "4")])
+  [(set_attr "type" "shift")
+   (set_attr "length" "4")])
+
+(define_insn "*movb"
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+			 (match_operand:SI 1 "const_int_operand" "n")
+			 (match_operand:SI 2 "const_int_operand" "n"))
+    (zero_extract:SI (match_operand:SI 3 "register_operand" "r")
+        (match_dup 1)
+	(match_operand:SI 4 "const_int_operand" "n")))]
+  "TARGET_BITOPS"
+  "movb %0,%0,%3,%2,%4,%1"
+  [(set_attr "type" "shift")
+   (set_attr "length" "4")])
 
 ;; ??? we want to use mrgb_i to combine two bitfield insertions.
 ;; Can combine understand this?  Else, we'll have to use a peephole2 pattern.
