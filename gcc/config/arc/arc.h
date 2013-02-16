@@ -303,6 +303,8 @@ along with GCC; see the file COPYING3.  If not see
 #define MULTILIB_DEFAULTS { "mARC700" }
 #endif
 
+#define TARGET_RRQ_CLASS TARGET_BITOPS
+
 /* Target machine storage layout.  */
 
 /* We want zero_extract to mean the same

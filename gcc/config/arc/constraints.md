@@ -66,8 +66,16 @@
    Link Registers @code{ilink1}:@code{r29}, @code{ilink2}:@code{r30},
    @code{blink}:@code{r31},")
 
-(define_register_constraint "q" "ARCOMPACT16_REGS"
+(define_register_constraint "q" "TARGET_Q_CLASS ? ARCOMPACT16_REGS : NO_REGS"
   "Registers usable in ARCompact 16-bit instructions: @code{r0}-@code{r3},
+   @code{r12}-@code{r15}")
+
+; EZchip bitfield instructions require registers from the r0-r3,r12-r15
+; range, and thus we need a register class and constraint that works
+; independently of size optimization.
+(define_register_constraint
+ "Rrq" "TARGET_RRQ_CLASS ? ARCOMPACT16_REGS : NO_REGS"
+  "Registers usable in EZchip bitfield instructions: @code{r0}-@code{r3},
    @code{r12}-@code{r15}")
 
 (define_register_constraint "e" "AC16_BASE_REGS"

@@ -1,11 +1,23 @@
 2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
 
+	* config/arc/arc.c (arc_conditional_register_usage): Target
+	TARGET_RRQ_CLASS into account.
+	* config/arc/arc.h (TARGET_RRQ_CLASS): Define.
+	* config/arc/arc.md (insv_i): Use Rrq, and w/C18/n/P constraints.
+	(extzv): Use Rrq constraint.
+	(movb_i): Likewise.
+	(movb_i_signed, movb_i_high, mov_b_i_high_signed): Likewise.
+	* config/arc/constraints.md (q): Make register class conditional.
+	(Rrq): New register constraint.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
 	* config/arc/arc.md (movb_i_signed, movb_i_high): New patterns.
 	(movb_i_high_signed): Likewise.
 
 2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
 
-	* config/arc/arc.md (movsi_insn <iw/Crr,w/Cbi>): Set type to shift.
+	* config/arc/arc.md (movsi_insn) <iw/Crr,w/Cbi>: Set type to shift.
 	(extzv, insv_i): Likewise.
 	(movb_i): New pattern.
 	* config/arc/constraints.md: (Cbi): Fix 64 bit issue with 'signed'

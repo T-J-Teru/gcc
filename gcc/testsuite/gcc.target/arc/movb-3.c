@@ -9,5 +9,5 @@ f (void)
 {
   bar.a = foo.a;
 }
-/* { dg-final { scan-assembler "movb\[ \t\]+r\[0-9\]+, *r\[0-9\]+, *r\[0-9\]+, *0, *0, *23" { target arc-*-* } } } */
-/* { dg-final { scan-assembler "movb\[ \t\]+r\[0-9\]+, *r\[0-9\]+, *r\[0-9\]+, *9, *9, *23" { target arceb-*-* } } } */
+/* { dg-final { scan-assembler "movb\[ \t\]+r\[0-5\]+, *r\[0-5\]+, *r\[0-5\]+, *0, *0, *23" { target arc-*-* } } } */
+/* { dg-final { scan-assembler "movb\[ \t\]+r\[0-5\]+, *r\[0-5\]+, *r\[0-5\]+, *9, *9, *23" { target arceb-*-* } } } */

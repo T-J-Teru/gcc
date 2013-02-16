@@ -5625,8 +5625,8 @@
    (set_attr "type" "misc")])
 
 (define_insn "extzv"
-  [(set (match_operand:SI 0 "register_operand" "=r")
-	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
+  [(set (match_operand:SI 0 "register_operand" "=Rrq")
+	(zero_extract:SI (match_operand:SI 1 "register_operand" "Rrq")
 			 (match_operand:SI 2 "const_int_operand" "n")
 			 (match_operand:SI 3 "const_int_operand" "n")))]
   "TARGET_BITOPS"
@@ -5648,10 +5648,10 @@
 })
 
 (define_insn "*insv_i"
-  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r,r")
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+w,Rrq")
 			 (match_operand:SI 1 "const_int_operand" "C18,n")
 			 (match_operand:SI 2 "const_int_operand" "n,n"))
-	(match_operand:SI 3 "nonmemory_operand" "P,r"))]
+	(match_operand:SI 3 "nonmemory_operand" "P,Rrq"))]
   "TARGET_BITOPS
    && (register_operand (operands[3], SImode)
        || satisfies_constraint_C18 (operands[1]))"
@@ -5662,10 +5662,10 @@
    (set_attr "length" "4")])
 
 (define_insn "*movb"
-  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+Rrq")
 			 (match_operand:SI 1 "const_int_operand" "n")
 			 (match_operand:SI 2 "const_int_operand" "n"))
-	(zero_extract:SI (match_operand:SI 3 "register_operand" "r")
+	(zero_extract:SI (match_operand:SI 3 "register_operand" "Rrq")
 			 (match_dup 1)
 			 (match_operand:SI 4 "const_int_operand" "n")))]
   "TARGET_BITOPS"
@@ -5674,10 +5674,10 @@
    (set_attr "length" "4")])
 
 (define_insn "*movb_signed"
-  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+Rrq")
 			 (match_operand:SI 1 "const_int_operand" "n")
 			 (match_operand:SI 2 "const_int_operand" "n"))
-	(sign_extract:SI (match_operand:SI 3 "register_operand" "r")
+	(sign_extract:SI (match_operand:SI 3 "register_operand" "Rrq")
 			 (match_dup 1)
 			 (match_operand:SI 4 "const_int_operand" "n")))]
   "TARGET_BITOPS"
@@ -5686,10 +5686,10 @@
    (set_attr "length" "4")])
 
 (define_insn "*movb_high"
-  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+Rrq")
 			 (match_operand:SI 1 "const_int_operand" "n")
 			 (match_operand:SI 2 "const_int_operand" "n"))
-	(lshiftrt:SI (match_operand:SI 3 "register_operand" "r")
+	(lshiftrt:SI (match_operand:SI 3 "register_operand" "Rrq")
 		     (match_operand:SI 4 "const_int_operand" "n")))]
   "TARGET_BITOPS
    && INTVAL (operands[4]) + INTVAL (operands[1]) <= 32"
@@ -5701,10 +5701,10 @@
 ; a word, gcc will use a narrow sign extending load, and in this case
 ; we will see INTVAL (operands[4]) + INTVAL (operands[1]) == 16 (or 8)
 (define_insn "*movb_high_signed"
-  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+Rrq")
 			 (match_operand:SI 1 "const_int_operand" "n")
 			 (match_operand:SI 2 "const_int_operand" "n"))
-	(ashiftrt:SI (match_operand:SI 3 "register_operand" "r")
+	(ashiftrt:SI (match_operand:SI 3 "register_operand" "Rrq")
 		     (match_operand:SI 4 "const_int_operand" "n")))]
   "TARGET_BITOPS
    && INTVAL (operands[4]) + INTVAL (operands[1]) <= 32"
