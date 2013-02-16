@@ -1,5 +1,9 @@
 2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
 
+	* gcc.target/arc/mrgb-1.c: New file.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
 	* gcc.target/arc/movb_i-1.c: Tighten register match patterns.
 	* gcc.target/arc/movb_i-2.c: Likewise.
 	* gcc.target/arc/movb_i-3.c: Likewise.

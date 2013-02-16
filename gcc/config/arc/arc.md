@@ -5712,8 +5712,85 @@
   [(set_attr "type" "shift")
    (set_attr "length" "4")])
 
-;; ??? we want to use mrgb_i to combine two bitfield insertions.
-;; Can combine understand this?  Else, we'll have to use a peephole2 pattern.
+(define_insn "*mrgb"
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+Rrq")
+			 (match_operand:SI 1 "const_int_operand" "n")
+			 (match_operand:SI 2 "const_int_operand" "n"))
+	(zero_extract:SI (match_dup 0) (match_dup 1)
+			 (match_operand:SI 3 "const_int_operand" "n")))
+   (set (zero_extract:SI (match_dup 0)
+			 (match_operand:SI 4 "const_int_operand" "n")
+			 (match_operand:SI 5 "const_int_operand" "n"))
+	(zero_extract:SI (match_operand:SI 6 "register_operand" "Rrq")
+			 (match_dup 4)
+			 (match_operand:SI 7 "const_int_operand" "n")))]
+  "TARGET_BITOPS"
+{
+  output_asm_insn ("mrgb %0,%0,%6,%2,%3,%1,%5,%7,%4", operands);
+  /* The ;%? updates the known unalignment.  */
+  return arc_short_long (insn, ";%?", "nop_s");
+}
+  [(set_attr "type" "shift")
+   (set_attr "length" "6")
+   (set_attr "iscompact" "true")])
+
+;; combine fumbles combination of two movb patterns, and then the
+;; combination is rejected by combinable_i3pat.
+;; Thus, we can only use a peephole2 to combine two such insns.
+
+(define_peephole2
+  [(set (match_operand:SI 0 "register_operand" "=Rrq")
+	(match_operand:SI 1 "register_operand" "Rrq"))
+   (set (zero_extract:SI (match_dup 0)
+			 (match_operand:SI 2 "const_int_operand" "n")
+			 (match_operand:SI 3 "const_int_operand" "n"))
+	(zero_extract:SI (match_dup 1)
+			 (match_dup 2)
+			 (match_operand:SI 4 "const_int_operand" "n")))
+   (match_operand 9) ; unrelated insn scheduled here
+   (set (zero_extract:SI (match_dup 0)
+			 (match_operand:SI 5 "const_int_operand" "n")
+			 (match_operand:SI 6 "const_int_operand" "n"))
+	(zero_extract:SI (match_operand:SI 7 "register_operand" "Rrq")
+			 (match_dup 5)
+			 (match_operand:SI 8 "const_int_operand" "n")))]
+  "TARGET_BITOPS
+   // Check that the second movb doesn't clobber an input of the extra insn.
+   && !reg_overlap_mentioned_p (operands[0], operands[9])
+   // And vice versa.
+   && !reg_set_p (operands[0], operands[9])
+   && !reg_set_p (operands[7], operands[9])"
+  [(set (match_dup 0) (match_dup 1))
+   (parallel [(set (zero_extract:SI (match_dup 0) (match_dup 1) (match_dup 2))
+		   (zero_extract:SI (match_dup 3) (match_dup 1) (match_dup 4)))
+	      (set (zero_extract:SI (match_dup 0) (match_dup 1) (match_dup 2))
+		   (zero_extract:SI (match_dup 3) (match_dup 1) (match_dup 4)))])
+   (match_dup 9)])
+
+(define_peephole2
+  [(set (match_operand:SI 0 "register_operand" "=Rrq")
+	(match_operand:SI 1 "register_operand" "Rrq"))
+   (set (zero_extract:SI (match_dup 0)
+			 (match_operand:SI 2 "const_int_operand" "n")
+			 (match_operand:SI 3 "const_int_operand" "n"))
+	(zero_extract:SI (match_dup 1)
+			 (match_dup 2)
+			 (match_operand:SI 4 "const_int_operand" "n")))
+   (set (match_dup 1) (match_operand 8))
+   (set (zero_extract:SI (match_dup 0)
+			 (match_operand:SI 5 "const_int_operand" "n")
+			 (match_operand:SI 6 "const_int_operand" "n"))
+	(zero_extract:SI (match_dup 1) (match_dup 5)
+			 (match_operand:SI 7 "const_int_operand" "n")))]
+  "TARGET_BITOPS
+   && !reg_overlap_mentioned_p (operands[0], operands[8])"
+  [(set (match_dup 0) (match_dup 1))
+   (set (match_dup 1) (match_dup 8))
+   (parallel [(set (zero_extract:SI (match_dup 0) (match_dup 2) (match_dup 3))
+		   (zero_extract:SI (match_dup 0) (match_dup 2) (match_dup 4)))
+	      (set (zero_extract:SI (match_dup 0) (match_dup 5) (match_dup 6))
+		   (zero_extract:SI (match_dup 1) (match_dup 5) (match_dup 7)))])
+   (match_dup 1)])
 
 ;; include the arc-FPX instructions
 (include "fpx.md")

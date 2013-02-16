@@ -1,5 +1,9 @@
 2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
 
+	* config/arc/arc.md (mrgb, mrgb+1, mrgb+2): New patterns.
+
+2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
 	* config/arc/arc.c (arc_conditional_register_usage): Target
 	TARGET_RRQ_CLASS into account.
 	* config/arc/arc.h (TARGET_RRQ_CLASS): Define.
