@@ -5665,10 +5665,49 @@
   [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
 			 (match_operand:SI 1 "const_int_operand" "n")
 			 (match_operand:SI 2 "const_int_operand" "n"))
-    (zero_extract:SI (match_operand:SI 3 "register_operand" "r")
-        (match_dup 1)
-	(match_operand:SI 4 "const_int_operand" "n")))]
+	(zero_extract:SI (match_operand:SI 3 "register_operand" "r")
+			 (match_dup 1)
+			 (match_operand:SI 4 "const_int_operand" "n")))]
   "TARGET_BITOPS"
+  "movb %0,%0,%3,%2,%4,%1"
+  [(set_attr "type" "shift")
+   (set_attr "length" "4")])
+
+(define_insn "*movb_signed"
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+			 (match_operand:SI 1 "const_int_operand" "n")
+			 (match_operand:SI 2 "const_int_operand" "n"))
+	(sign_extract:SI (match_operand:SI 3 "register_operand" "r")
+			 (match_dup 1)
+			 (match_operand:SI 4 "const_int_operand" "n")))]
+  "TARGET_BITOPS"
+  "movb %0,%0,%3,%2,%4,%1"
+  [(set_attr "type" "shift")
+   (set_attr "length" "4")])
+
+(define_insn "*movb_high"
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+			 (match_operand:SI 1 "const_int_operand" "n")
+			 (match_operand:SI 2 "const_int_operand" "n"))
+	(lshiftrt:SI (match_operand:SI 3 "register_operand" "r")
+		     (match_operand:SI 4 "const_int_operand" "n")))]
+  "TARGET_BITOPS
+   && INTVAL (operands[4]) + INTVAL (operands[1]) <= 32"
+  "movb %0,%0,%3,%2,%4,%1"
+  [(set_attr "type" "shift")
+   (set_attr "length" "4")])
+
+; N.B.: when processing signed bitfields that fit in the top half of
+; a word, gcc will use a narrow sign extending load, and in this case
+; we will see INTVAL (operands[4]) + INTVAL (operands[1]) == 16 (or 8)
+(define_insn "*movb_high_signed"
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+			 (match_operand:SI 1 "const_int_operand" "n")
+			 (match_operand:SI 2 "const_int_operand" "n"))
+	(ashiftrt:SI (match_operand:SI 3 "register_operand" "r")
+		     (match_operand:SI 4 "const_int_operand" "n")))]
+  "TARGET_BITOPS
+   && INTVAL (operands[4]) + INTVAL (operands[1]) <= 32"
   "movb %0,%0,%3,%2,%4,%1"
   [(set_attr "type" "shift")
    (set_attr "length" "4")])
