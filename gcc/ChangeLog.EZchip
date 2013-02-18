@@ -1,3 +1,8 @@
+2013-02-18  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (movb_i_high_signed+1): New combine-splitter
+	pattern.
+
 2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config/arc/arc.md (mrgb, mrgb+1, mrgb+2): New patterns.

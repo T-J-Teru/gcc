@@ -5712,6 +5712,19 @@
   [(set_attr "type" "shift")
    (set_attr "length" "4")])
 
+(define_split
+  [(set (match_operand:SI 0 "register_operand" "")
+	(ior:SI (ashift:SI (match_operand:SI 1 "register_operand" "")
+			   (match_operand:SI 2 "const_int_operand" ""))
+		(subreg:SI (match_operand 3 "") 0)))]
+  "TARGET_BITOPS
+   && GET_MODE_BITSIZE (GET_MODE (operands[3])) <= INTVAL (operands[2])
+   && !reg_overlap_mentioned_p (operands[0], operands[1])"
+  [(set (match_dup 0) (zero_extend:SI (match_dup 3)))
+   (set (zero_extract:SI (match_dup 0) (match_dup 4) (match_dup 2))
+	(match_dup 1))]
+  "operands[4] = GEN_INT (32 - INTVAL (operands[2]));")
+
 (define_insn "*mrgb"
   [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+Rrq")
 			 (match_operand:SI 1 "const_int_operand" "n")
