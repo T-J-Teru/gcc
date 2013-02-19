@@ -1,3 +1,8 @@
+2013-03-05  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/constraints.md (Chi): Make behaviour independent of
+	HOST_WIDE_INT size.
+
 2013-02-19  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config.gcc (arc-*-elf*, arc*-*-linux-uclibc*): Set BITOPS_DEFAULT=1
@@ -7,6 +12,9 @@
 	(STRICT_ALIGNMENT): Use unaligned_access.
 	* config/arc/arc.opt (mbitops): Use BITOPS_DEFAULT.
 	(munaligned-access): New option.
+
+	* config/arc/constraints.md (Clo, Chi): New constraints.
+	* config/arc/arc.md (movsi_insn): New alternatives w/Clo and w/Chi.
 
 2013-02-18  Joern Rennecke  <joern.rennecke@embecosm.com>
 

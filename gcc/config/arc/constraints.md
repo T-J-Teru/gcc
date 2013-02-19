@@ -244,11 +244,26 @@
   (and (match_code "const_int")
        (match_test "ival == 0xff || ival == 0xffff")))
 
+(define_constraint "Clo"
+ "@internal
+  constant that fits into 16 lower bits, for movl"
+  (and (match_code "const_int")
+       (match_test "TARGET_BITOPS")
+       (match_test "(ival & ~0xffffU) == 0")))
+
+(define_constraint "Chi"
+ "@internal
+  constant that fits into 16 higher bits, for movh_i"
+  (and (match_code "const_int")
+       (match_test "TARGET_BITOPS")
+       (match_test "trunc_int_for_mode (ival >> 16, HImode) << 16 == ival")))
+
 (define_constraint "Cbf"
  "@internal
-  a mask for a bit field"
+  a mask for a bit field, for AND using movb_i"
   (and (match_code "const_int")
-       (match_test "TARGET_BITOPS && IS_POWEROF2_OR_0_P (ival + (ival & -ival))")))
+       (match_test "TARGET_BITOPS")
+       (match_test "IS_POWEROF2_OR_0_P (ival + (ival & -ival))")))
 
 (define_constraint "C18"
  "@internal

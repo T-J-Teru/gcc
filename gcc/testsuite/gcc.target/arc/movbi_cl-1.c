@@ -6,4 +6,4 @@ f (int i)
 {
   return 0x6e00;
 }
-/* { dg-final { scan-assembler "movbi\.cl" } } */
+/* { dg-final { scan-assembler "mov(bi|l)\.cl" } } */
