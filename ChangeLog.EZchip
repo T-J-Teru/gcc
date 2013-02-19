@@ -1,0 +1,4 @@
+2013-02-19  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config.sub: Add ezchip and arceb-ezchip as acceptable
+	$basic_machine.
