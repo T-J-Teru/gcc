@@ -659,6 +659,9 @@ case $basic_machine in
 		basic_machine=m68k-ericsson
 		os=-ose
 		;;
+	ezchip | arceb-ezchip)
+		basic_machine=arceb-ezchip
+		;;
 	fx2800)
 		basic_machine=i860-alliant
 		;;
