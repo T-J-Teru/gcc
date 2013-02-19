@@ -411,5 +411,9 @@ Target Report Mask(ATOMIC)
 Enable atomic instructions.
 
 mbitops
-Target Var(TARGET_BITOPS)
+Target Report Var(TARGET_BITOPS) Init(BITOPS_DEFAULT)
 Enable use of EZchip bit operations.
+
+munaligned-access
+Target Report Var(unaligned_access) Init(UNALIGNED_ACCESS_DEFAULT)
+Enable unaligned word and halfword accesses to packed data.
