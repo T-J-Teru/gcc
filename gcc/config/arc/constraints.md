@@ -244,6 +244,12 @@
   (and (match_code "const_int")
        (match_test "ival == 0xff || ival == 0xffff")))
 
+(define_constraint "Chs"
+ "@internal
+  constant for a highpart that can be checked with a shift (asr.f 0,rn,m)"
+  (and (match_code "const_int")
+       (match_test "IS_POWEROF2_P (-ival)")))
+
 (define_constraint "Clo"
  "@internal
   constant that fits into 16 lower bits, for movl"
@@ -264,6 +270,12 @@
   (and (match_code "const_int")
        (match_test "TARGET_BITOPS")
        (match_test "IS_POWEROF2_OR_0_P (ival + (ival & -ival))")))
+
+(define_constraint "Cbn"
+ "@internal
+  a constant integer, valid only if TARGET_BITOPS is true"
+  (and (match_code "const_int")
+       (match_test "TARGET_BITOPS")))
 
 (define_constraint "C18"
  "@internal

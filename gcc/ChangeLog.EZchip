@@ -16,6 +16,14 @@
 	* config/arc/constraints.md (Clo, Chi): New constraints.
 	* config/arc/arc.md (movsi_insn): New alternatives w/Clo and w/Chi.
 
+	* config/arc/constraints.md (Chs, Cbn): New constraints.
+	* config/arc/arc.md (tst_movb_i, tst_bitfield_tst): New patterns.
+	(tst_bitfield_asr, tst_bitfield): Likewise.
+	(tst): Avoid recognition if it could prevent test_movb_i combination.
+	Replace c/CnL with c/Chs alternative.
+
+	* config/arc/arc.md (mrgb_i+1, mrgb_i+2): Remove constraints.
+
 2013-02-18  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config/arc/arc.md (movb_i_high_signed+1): New combine-splitter

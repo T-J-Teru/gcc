@@ -1,6 +1,7 @@
 2013-02-19  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* gcc.target/arc/movl_i-1.c: New file.
+	* gcc.target/arc/movb_i_cl-2.c: New file.
 
 2013-02-16  Joern Rennecke  <joern.rennecke@embecosm.com>
 

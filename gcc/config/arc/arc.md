@@ -797,6 +797,24 @@
    (set_attr "cond" "set_zn")
    (set_attr "length" "4")])
 
+; reload is too stingy with reloads for Rrq/Cbf/Rrq when it sees
+; a c/???Cal/X alternative, so we say it's c/???Cal/c instead,
+; even if we don't need the clobber.
+(define_insn_and_split "*tst_movb"
+  [(set
+     (match_operand 0 "cc_register" "")
+     (match_operator 4 "zn_compare_operator"
+       [(and:SI
+	  (match_operand:SI 1 "register_operand"  "%Rcq,Rcq, c,  c,  c,  c,Rrq,  3,  c")
+	  (match_operand:SI 2 "nonmemory_operand"  "Rcq,C0p,cI,C1p,Ccp,Chs,Cbf,Cbf,???Cal"))
+	(const_int 0)]))
+   (clobber (match_scratch:SI 3 "=X,X,X,X,X,X,Rrq,Rrq,c"))]
+  "TARGET_BITOPS"
+  "movb.f.cl %3,%1,%p2,%p2,%s2"
+  "reload_completed
+   && (extract_constrain_insn_cached (insn), (which_alternative & ~1) != 6)"
+  [(set (match_dup 0) (match_dup 4))])
+
 (define_insn "*tst"
   [(set
      (match_operand 0 "cc_register" "")
@@ -805,12 +823,14 @@
 	  (match_operand:SI 1 "register_operand"
 	   "%Rcq,Rcq, c, c, c,  c,  c,  c")
 	  (match_operand:SI 2 "nonmemory_operand"
-	   " Rcq,C0p,cI,cL,C1p,Ccp,CnL,Cal"))
+	   " Rcq,C0p,cI,cL,C1p,Ccp,Chs,Cal"))
 	(const_int 0)]))]
-  "(register_operand (operands[1], SImode)
-    && nonmemory_operand (operands[2], SImode))
-   || (memory_operand (operands[1], SImode)
-       && satisfies_constraint_Cux (operands[2]))"
+  "reload_completed
+   || !satisfies_constraint_Cbf (operands[2])
+   || satisfies_constraint_C0p (operands[2])
+   || satisfies_constraint_I (operands[2])
+   || satisfies_constraint_C1p (operands[2])
+   || satisfies_constraint_Chs (operands[2])"
   "*
     switch (which_alternative)
     {
@@ -823,16 +843,78 @@
     case 5:
       return \"bclr%?.f 0,%1,%M2%&\";
     case 6:
-      return \"bic%?.f 0,%1,%n2-1\";
+      return \"asr.f 0,%1,%p2\";
     default:
       gcc_unreachable ();
     }
   "
   [(set_attr "iscompact" "maybe,maybe,false,false,false,false,false,false")
-   (set_attr "type" "compare")
+   (set_attr "type" "compare,compare,compare,compare,compare,compare,shift,compare")
    (set_attr "length" "*,*,4,4,4,4,4,8")
    (set_attr "predicable" "no,yes,no,yes,no,no,no,yes")
    (set_attr "cond" "set_zn")])
+
+; ??? Sometimes, if an AND with a constant can be expressed as a zero_extract,
+; combine will do that and not try the AND.
+
+; It would take 66 constraint combinations to describe the zero_extract
+; constants that are covered by the 12-bit signed constant for tst
+; (excluding the ones that are better done by mov or btst).
+; so we rather use an extra pattern for tst;
+; since this is about constants, reload shouldn't care.
+(define_insn "*tst_bitfield_tst"
+  [(set (match_operand:CC_ZN 0 "cc_set_register" "")
+	(match_operator 4 "zn_compare_operator"
+	  [(zero_extract:SI
+	     (match_operand:SI 1 "register_operand"  "c")
+	     (match_operand:SI 2 "const_int_operand" "n")
+	     (match_operand:SI 3 "const_int_operand" "n"))
+	   (const_int 0)]))]
+  "INTVAL (operands[2]) > 1
+   && (INTVAL (operands[3]) + INTVAL (operands[2]) <= 11
+       || (INTVAL (operands[3]) <= 11
+	   && INTVAL (operands[3]) + INTVAL (operands[2]) == 32))"
+  "tst %1,(1<<%2)-1<<%3"
+  [(set_attr "type" "compare")
+   (set_attr "cond" "set_zn")
+   (set_attr "length" "4")])
+
+; Likewise for asr.f.
+(define_insn "*tst_bitfield_asr"
+  [(set (match_operand:CC_ZN 0 "cc_set_register" "")
+	(match_operator 4 "zn_compare_operator"
+	  [(zero_extract:SI
+	     (match_operand:SI 1 "register_operand"  "c")
+	     (match_operand:SI 2 "const_int_operand" "n")
+	     (match_operand:SI 3 "const_int_operand" "n"))
+	   (const_int 0)]))]
+  "INTVAL (operands[2]) > 1
+   && INTVAL (operands[3]) + INTVAL (operands[2]) == 32"
+  "asr.f 0,%1,%3"
+  [(set_attr "type" "shift")
+   (set_attr "cond" "set_zn")
+   (set_attr "length" "4")])
+
+(define_insn "*tst_bitfield"
+  [(set (match_operand:CC_ZN 0 "cc_set_register" "")
+	(match_operator 5 "zn_compare_operator"
+	  [(zero_extract:SI
+	     (match_operand:SI 1 "register_operand" "%Rcqq,c,  c,Rrq,c")
+	     (match_operand:SI 2 "const_int_operand"    "N,N,  n,Cbn,n")
+	     (match_operand:SI 3 "const_int_operand"    "n,n,C_0,Cbn,n"))
+	   (const_int 0)]))
+   (clobber (match_scratch:SI 4 "=X,X,X,Rrq,X"))]
+  ""
+  "@
+   btst%? %1,%3
+   btst %1,%3
+   bmsk.f 0,%1,%2-1
+   movb.f.cl %4,%1,%3,%3,%2
+   and.f 0,%1,((1<<%2)-1)<<%3"
+  [(set_attr "iscompact" "maybe,false,false,false,false")
+   (set_attr "type" "compare,compare,compare,shift,compare")
+   (set_attr "cond" "set_zn")
+   (set_attr "length" "*,4,4,4,8")])
 
 (define_insn "*commutative_binary_comparison"
   [(set (match_operand:CC_ZN 0 "cc_set_register" "")
@@ -5752,21 +5834,21 @@
 ;; Thus, we can only use a peephole2 to combine two such insns.
 
 (define_peephole2
-  [(set (match_operand:SI 0 "register_operand" "=Rrq")
-	(match_operand:SI 1 "register_operand" "Rrq"))
+  [(set (match_operand:SI 0 "register_operand" "")
+	(match_operand:SI 1 "register_operand" ""))
    (set (zero_extract:SI (match_dup 0)
-			 (match_operand:SI 2 "const_int_operand" "n")
-			 (match_operand:SI 3 "const_int_operand" "n"))
+			 (match_operand:SI 2 "const_int_operand" "")
+			 (match_operand:SI 3 "const_int_operand" ""))
 	(zero_extract:SI (match_dup 1)
 			 (match_dup 2)
-			 (match_operand:SI 4 "const_int_operand" "n")))
+			 (match_operand:SI 4 "const_int_operand" "")))
    (match_operand 9) ; unrelated insn scheduled here
    (set (zero_extract:SI (match_dup 0)
-			 (match_operand:SI 5 "const_int_operand" "n")
-			 (match_operand:SI 6 "const_int_operand" "n"))
-	(zero_extract:SI (match_operand:SI 7 "register_operand" "Rrq")
+			 (match_operand:SI 5 "const_int_operand" "")
+			 (match_operand:SI 6 "const_int_operand" ""))
+	(zero_extract:SI (match_operand:SI 7 "register_operand" "")
 			 (match_dup 5)
-			 (match_operand:SI 8 "const_int_operand" "n")))]
+			 (match_operand:SI 8 "const_int_operand" "")))]
   "TARGET_BITOPS
    // Check that the second movb doesn't clobber an input of the extra insn.
    && !reg_overlap_mentioned_p (operands[0], operands[9])
@@ -5781,20 +5863,20 @@
    (match_dup 9)])
 
 (define_peephole2
-  [(set (match_operand:SI 0 "register_operand" "=Rrq")
-	(match_operand:SI 1 "register_operand" "Rrq"))
+  [(set (match_operand:SI 0 "register_operand" "")
+	(match_operand:SI 1 "register_operand" ""))
    (set (zero_extract:SI (match_dup 0)
-			 (match_operand:SI 2 "const_int_operand" "n")
-			 (match_operand:SI 3 "const_int_operand" "n"))
+			 (match_operand:SI 2 "const_int_operand" "")
+			 (match_operand:SI 3 "const_int_operand" ""))
 	(zero_extract:SI (match_dup 1)
 			 (match_dup 2)
-			 (match_operand:SI 4 "const_int_operand" "n")))
+			 (match_operand:SI 4 "const_int_operand" "")))
    (set (match_dup 1) (match_operand 8))
    (set (zero_extract:SI (match_dup 0)
-			 (match_operand:SI 5 "const_int_operand" "n")
-			 (match_operand:SI 6 "const_int_operand" "n"))
+			 (match_operand:SI 5 "const_int_operand" "")
+			 (match_operand:SI 6 "const_int_operand" ""))
 	(zero_extract:SI (match_dup 1) (match_dup 5)
-			 (match_operand:SI 7 "const_int_operand" "n")))]
+			 (match_operand:SI 7 "const_int_operand" "")))]
   "TARGET_BITOPS
    && !reg_overlap_mentioned_p (operands[0], operands[8])"
   [(set (match_dup 0) (match_dup 1))
