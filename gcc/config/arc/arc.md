@@ -5706,12 +5706,21 @@
   [(set_attr "length" "4")
    (set_attr "type" "misc")])
 
-(define_insn "extzv"
+(define_expand "extzv"
+  [(set (match_operand:SI 0 "register_operand" "")
+	(zero_extract:SI (match_operand:SI 1 "register_operand" "")
+			 (match_operand:SI 2 "const_int_operand" "")
+			 (match_operand:SI 3 "const_int_operand" "")))]
+  "TARGET_BITOPS")
+
+; We need a sanity check in the instuction predicate because combine
+; will throw any old rubbish at us and see what sticks.
+(define_insn "*extzv_i"
   [(set (match_operand:SI 0 "register_operand" "=Rrq")
 	(zero_extract:SI (match_operand:SI 1 "register_operand" "Rrq")
 			 (match_operand:SI 2 "const_int_operand" "n")
 			 (match_operand:SI 3 "const_int_operand" "n")))]
-  "TARGET_BITOPS"
+  "TARGET_BITOPS && INTVAL (operands[2]) + INTVAL (operands[3]) <= 32"
   "movb.cl %0,%1,0,%3,%2"
   [(set_attr "type" "shift")
    (set_attr "length" "4")])

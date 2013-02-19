@@ -24,6 +24,9 @@
 
 	* config/arc/arc.md (mrgb_i+1, mrgb_i+2): Remove constraints.
 
+	* config/arc/arc.md (extzv): Now a define_expand.
+	(extzv_i): New pattern.
+
 2013-02-18  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config/arc/arc.md (movb_i_high_signed+1): New combine-splitter
