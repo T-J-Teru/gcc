@@ -1006,8 +1006,9 @@ arc*-*-elf*)
 	esac
 	case ${target} in
 	arc*-ezchip-*)
-		#tm_defines="${tm_defines} UNALIGNED_ACCESS_DEFAULT=1 BITOPS_DEFAULT=1";;
-		tm_defines="${tm_defines} BITOPS_DEFAULT=1";;
+		#tm_defines="${tm_defines} UNALIGNED_ACCESS_DEFAULT=1 BITOPS_DEFAULT=1"
+		tm_defines="${tm_defines} BITOPS_DEFAULT=1"
+		tmake_file="${tmake_file} arc/t-ezchip";;
 	esac
 	;;
 arc*-*-linux-uclibc*)
@@ -1036,8 +1037,9 @@ arc*-*-linux-uclibc*)
 	esac
 	case ${target} in
 	arc*-ezchip-*)
-		#tm_defines="${tm_defines} UNALIGNED_ACCESS_DEFAULT=1 BITOPS_DEFAULT=1";;
-		tm_defines="${tm_defines} BITOPS_DEFAULT=1";;
+		#tm_defines="${tm_defines} UNALIGNED_ACCESS_DEFAULT=1 BITOPS_DEFAULT=1"
+		tm_defines="${tm_defines} BITOPS_DEFAULT=1"
+		tmake_file="${tmake_file} arc/t-ezchip";;
 	esac
         ;;
 arm-wrs-vxworks)

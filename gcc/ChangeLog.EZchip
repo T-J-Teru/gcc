@@ -1,3 +1,9 @@
+2013-03-11  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/t-ezchip: New file.
+	config.gcc (arc-*-elf*, arc*-*-linux-uclibc*) <arc*-ezchip-*>:
+	Add arc/t-ezchip to tmake_file.
+
 2013-03-05  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config/arc/constraints.md (Chi): Make behaviour independent of
