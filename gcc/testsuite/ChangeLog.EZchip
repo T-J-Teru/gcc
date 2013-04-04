@@ -1,3 +1,10 @@
+2013-04-04  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/setmem-1.c: New file.
+	* gcc.target/arc/setmem-2.c: New file.
+	* gcc.target/arc/setmem-3.c: New file.
+	* gcc.target/arc/setmem-4.c: New file.
+
 2013-02-19  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* gcc.target/arc/movl_i-1.c: New file.
