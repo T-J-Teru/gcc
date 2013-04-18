@@ -1,3 +1,8 @@
+2013-08-08  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* builtins.c (fold_builtin_constant_p): Consider addresses for
+	global/static variables as constant when they are bound locally.
+
 2014-06-27  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* reorg.c (reorg_set2live): New function.

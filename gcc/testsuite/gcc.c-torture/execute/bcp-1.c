@@ -3,7 +3,7 @@
 extern void abort (void);
 extern void exit (int);
 
-__attribute__ ((externally_visible)) int global;
+__attribute__ ((externally_visible)) int global = 1;
 int func(void);
 
 /* These must fail.  */
@@ -17,12 +17,12 @@ inline int bad6(int x) { return __builtin_constant_p(x+1); }
 int bad7(void) { return __builtin_constant_p(func()); }
 int bad8(void) { char buf[10]; return __builtin_constant_p(buf); }
 int bad9(const char *x) { return __builtin_constant_p(x[123456]); }
-int bad10(void) { return __builtin_constant_p(&global); }
 
 /* These must pass, or we've broken gcc2 functionality.  */
 int good0(void) { return __builtin_constant_p(1); }
 int good1(void) { return __builtin_constant_p("hi"); }
 int good2(void) { return __builtin_constant_p((1234 + 45) & ~7); }
+int good3(void) { return __builtin_constant_p(&global); }
 
 /* These are extensions to gcc2.  Failure indicates an optimization
    regression.  */
@@ -45,7 +45,7 @@ int opt2(void) { return __builtin_constant_p("hi"[0]); }
 
 /* Call through tables so -finline-functions can't screw with us.  */
 int (* volatile bad_t0[])(void) = {
-	bad0, bad1, bad5, bad7, bad8, bad10
+	bad0, bad1, bad5, bad7, bad8
 };
 
 int (* volatile bad_t1[])(int x) = {
@@ -57,7 +57,7 @@ int (* volatile bad_t2[])(const char *x) = {
 };
 
 int (* volatile good_t0[])(void) = {
-	good0, good1, good2
+	good0, good1, good2, good3
 };
 
 int (* volatile opt_t0[])(void) = {
