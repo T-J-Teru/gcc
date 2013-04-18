@@ -1,3 +1,14 @@
+2013-08-08  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.c-torture/execute/20130418-1.c: New test.
+	* gcc.c-torture/execute/20130418-2.c: Likewise.
+	* gcc.c-torture/execute/20130418-3.c: Likewise.
+	* gcc.c-torture/execute/20130418-4.c: Likewise.
+	* gcc.c-torture/execute/20130418-5.c: Likewise.
+	* gcc.c-torture/execute/bcp-1.c (global): Initialise.
+	(bad10): Moved to...
+	(good3): ...here.
+
 2013-04-04  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* gcc.target/arc/setmem-1.c: New file.
