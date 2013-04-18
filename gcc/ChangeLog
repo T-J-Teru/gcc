@@ -1,3 +1,8 @@
+2013-08-08  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* builtins.c (fold_builtin_constant_p): Consider addresses for
+	global/static variables as constant when they are bound locally.
+
 2016-06-16  Claudiu Zissulescu  <claziss@synopsys.com>
 	    Joern Rennecke  <joern.rennecke@embecosm.com>
 
