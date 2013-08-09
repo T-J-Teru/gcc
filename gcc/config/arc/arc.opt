@@ -457,6 +457,10 @@ Enum(arc_fpu) String(fpus_all) Value(FPU_SP | FPU_SC | FPU_SF | FPU_SD)
 EnumValue
 Enum(arc_fpu) String(fpud_all) Value(FPU_SP | FPU_SC | FPU_SF | FPU_SD | FPU_DP | FPU_DC | FPU_DF | FPU_DD)
 
+mcmem
+Target Report Var(TARGET_NPS400_CMEM) Init(TARGET_NPS400_CMEM_DEFAULT) Condition(ARC_NPS400)
+Enable use of NPS400 xld/xst extension.
+
 munaligned-access
 Target Report Var(unaligned_access) Init(UNALIGNED_ACCESS_DEFAULT) Condition(ARC_NPS400)
 Enable unaligned word and halfword accesses to packed data.
