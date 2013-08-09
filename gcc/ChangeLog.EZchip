@@ -1,3 +1,24 @@
+2013-08-09  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.h (SYMBOL_FLAG_CMEM): Define.
+	(CMEM_DEFAULT): Provide default definition.
+	* c-family/c-common.c (handle_section_attribute): Don't set
+	user_defined_section_attribute for VAR_DECL.
+	* config.gcc (arc*-ezchip-elf) <tm_defines>: Add CMEM_DEFAULT=1.
+	(arc*-ezchip-linux-uclibc) <tm_defines>: Likewise.
+	* config/arc/arc.c (arc_address_cost): Return 0 for cmem_address.
+	(arc_print_operand): Recognize 'C' code.
+	(arc_encode_section_info): Set SYMBOL_FLAG_CMEM where indicated.
+	* config/arc/arc.md (movsi_insn): Add r/Ucm,Ucm/c alternatives.
+	* config/arc/arc.opt (mcmem): New option.
+	* config/arc/constraints.md (Ucm): New define_constraint.
+	* config/arc/predicates.md (long_immediate_loadstore_operand):
+	Return 0 for MEM with cmem_address address.
+	(cmem_address_0, cmem_address_1, cmem_address_2): New predicates.
+	(cmem_address): Likewise.
+
+	* config/arc/constraints.md (Usd, Us<, Us>): Use define_constraint.
+
 2013-08-08  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* builtins.c (fold_builtin_constant_p): Consider addresses for

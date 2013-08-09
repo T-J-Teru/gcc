@@ -325,7 +325,10 @@
   (and (match_code "mem")
        (match_test "compact_store_memory_operand (op, VOIDmode)")))
 
-(define_memory_constraint "Usd"
+; This constraint is for memory, but define_memory_constraint is
+; specifically for constraints that can be satisfied by reloading
+; the address into a register.
+(define_constraint "Usd"
   "@internal
    A valid _small-data_ memory operand for ARCompact instructions"
   (and (match_code "mem")
@@ -339,7 +342,7 @@
 ;; ??? the assembler rejects stores of immediates to small data.
        (match_test "!compact_sda_memory_operand (op, VOIDmode)")))
 
-(define_memory_constraint "Us<"
+(define_constraint "Us<"
   "@internal
    Stack pre-decrement"
   (and (match_code "mem")
@@ -347,13 +350,19 @@
        (match_test "REG_P (XEXP (XEXP (op, 0), 0))")
        (match_test "REGNO (XEXP (XEXP (op, 0), 0)) == SP_REG")))
 
-(define_memory_constraint "Us>"
+(define_constraint "Us>"
   "@internal
    Stack post-increment"
   (and (match_code "mem")
        (match_test "GET_CODE (XEXP (op, 0)) == POST_INC")
        (match_test "REG_P (XEXP (XEXP (op, 0), 0))")
        (match_test "REGNO (XEXP (XEXP (op, 0), 0)) == SP_REG")))
+
+(define_constraint "Ucm"
+  "@internal
+  cmem access"
+  (and (match_code "mem")
+       (match_test "TARGET_CMEM && cmem_address (XEXP (op, 0), VOIDmode)")))
 
 ;; General constraints
 
@@ -482,4 +491,3 @@
 (define_memory_constraint "ATO"
   "A memory with only a base register"
   (match_operand 0 "mem_noofs_operand"))
-

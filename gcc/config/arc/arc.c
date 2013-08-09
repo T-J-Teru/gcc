@@ -1675,6 +1675,8 @@ arc_address_cost (rtx addr, machine_mode, addr_space_t, bool speed)
     case LABEL_REF :
     case SYMBOL_REF :
     case CONST :
+      if (TARGET_CMEM && cmem_address (addr, SImode))
+	return 0;
       /* Most likely needs a LIMM.  */
       return COSTS_N_INSNS (1);
 
@@ -2810,6 +2812,7 @@ static int output_scaled = 0;
     '!' : jump / call suffix for conditional execution or short instruction
     '`': fold constant inside unary o-perator, re-recognize, and emit.
     'd'
+    'C': Memory with cm: prefix
     'D'
     'R': Second word
     'S'
@@ -3116,6 +3119,16 @@ arc_print_operand (FILE *file, rtx x, int code)
 	}
       else
 	output_operand_lossage ("invalid operand to %%V code");
+      return;
+    case 'C' :
+      if (GET_CODE (x) == MEM)
+	{
+	  fputs ("[cm:", file);
+	  output_address (VOIDmode, XEXP (x, 0));
+	  fputc (']', file);
+	}
+      else
+	output_operand_lossage ("invalid operand to %%C code");
       return;
       /* plt code.  */
     case 'P':
@@ -4146,6 +4159,24 @@ arc_encode_section_info (tree decl, rtx rtl, int first)
 	flags |= SYMBOL_FLAG_SHORT_CALL;
 
       SYMBOL_REF_FLAGS (symbol) = flags;
+    }
+  else if (TREE_CODE (decl) == VAR_DECL)
+    {
+      rtx symbol = XEXP (rtl, 0);
+
+      tree attr = (TREE_TYPE (decl) != error_mark_node
+		   ? DECL_ATTRIBUTES (decl) : NULL_TREE);
+
+      tree sec_attr = lookup_attribute ("section", attr);
+      if (sec_attr)
+	{
+	  const char *sec_name
+	    = TREE_STRING_POINTER (TREE_VALUE (TREE_VALUE (sec_attr)));
+	  if (strcmp (sec_name, ".cmem") == 0
+	      || strcmp (sec_name, ".cmem_shared") == 0
+	      || strcmp (sec_name, ".cmem_private") == 0)
+          SYMBOL_REF_FLAGS (symbol) |= SYMBOL_FLAG_CMEM;
+	}
     }
 }
 

@@ -414,6 +414,10 @@ mbitops
 Target Report Var(TARGET_BITOPS) Init(BITOPS_DEFAULT)
 Enable use of EZchip bit operations.
 
+mcmem
+Target Report Var(TARGET_CMEM) Init(CMEM_DEFAULT)
+Enable use of EZchip xld/xst extension.
+
 munaligned-access
 Target Report Var(unaligned_access) Init(UNALIGNED_ACCESS_DEFAULT)
 Enable unaligned word and halfword accesses to packed data.
