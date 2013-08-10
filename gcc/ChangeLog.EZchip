@@ -1,3 +1,8 @@
+2013-08-10  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config.gcc (arc*-ezchip-*-*) <tm_defines>: Comment out
+	addition of BITOPS_DEFAULT=1 CMEM_DEFAULT=1.
+
 2013-08-09  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config/arc/arc.h (SYMBOL_FLAG_CMEM): Define.
