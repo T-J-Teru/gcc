@@ -325,6 +325,13 @@
   (and (match_code "mem")
        (match_test "compact_store_memory_operand (op, VOIDmode)")))
 
+(define_memory_constraint "Uex"
+  "@internal
+   A valid memory operand for limm-free extend instructions"
+  (and (match_code "mem")
+       (match_test "!cmem_address (XEXP (op, 0), SImode)")
+       (not (match_operand 0 "long_immediate_loadstore_operand"))))
+
 ; This constraint is for memory, but define_memory_constraint is
 ; specifically for constraints that can be satisfied by reloading
 ; the address into a register.
