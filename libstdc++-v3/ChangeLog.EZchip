@@ -1,0 +1,4 @@
+2013-10-07  Tal Zilcer  <talz@ezchip.com>
+
+	* acinclude.m4: Disable use of gc-sections.
+	* configure: Regenerate.
