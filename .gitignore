@@ -46,6 +46,9 @@ core
 
 lost+found
 
+.project
+.cproject
+
 # ignore ./contrib/gcc_update output
 LAST_UPDATED
 REVISION
