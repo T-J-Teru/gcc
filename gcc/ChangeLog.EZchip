@@ -1,3 +1,7 @@
+2014-06-27  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* reorg.c (reorg_set2live): New function.
+	(reorg_redirect_jump): Use it.
 2013-08-17  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* config/arc/arc.opt (mdecode): New option.
