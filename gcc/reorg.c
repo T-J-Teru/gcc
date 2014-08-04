@@ -1776,13 +1776,46 @@ update_block (rtx insn, rtx where)
   incr_ticks_for_insn (insn);
 }
 
+typedef struct { basic_block bb; rtx insn; } set2livedata_t;
+
+/* Called via note_stores by reorg_redirect_jump.  */
+static void
+reorg_set2live (rtx x, const_rtx set, void *data_in)
+{
+  set2livedata_t *data = (set2livedata_t*) data_in;
+  int i;
+
+  if (GET_CODE (set) != SET || !REG_P (x)
+      || find_regno_note (data->insn, REG_UNUSED, REGNO (x)))
+    return;
+  for (i = hard_regno_nregs[REGNO (x)][GET_MODE (x)] -1; i >= 0; i--)
+    SET_REGNO_REG_SET (DF_LR_IN (data->bb), REGNO (x) + i);
+}
 /* Similar to REDIRECT_JUMP except that we update the BB_TICKS entry for
-   the basic block containing the jump.  */
+   the basic block containing the jump, and if we are about to delete
+   leading USE-wrapped insns, we update DF_LR_IN accordingly.  */
 
 static int
 reorg_redirect_jump (rtx jump, rtx nlabel)
 {
   incr_ticks_for_insn (jump);
+  rtx olabel = JUMP_LABEL (jump);
+  if (!ANY_RETURN_P (olabel) && LABEL_NUSES (JUMP_LABEL (jump)) == 1
+      && NEXT_INSN (olabel) && NOTE_INSN_BASIC_BLOCK_P (NEXT_INSN (olabel))
+      && BLOCK_FOR_INSN (olabel) == NOTE_BASIC_BLOCK (NEXT_INSN (olabel)))
+    {
+      for (rtx scan = olabel; (scan = next_nonnote_insn (scan));)
+	{
+	  if (GET_CODE (scan) != INSN || GET_CODE (PATTERN (scan)) != USE
+	      || !INSN_P (XEXP (PATTERN (scan), 0)))
+	    break;
+	  set2livedata_t data;
+	  rtx inner = XEXP (PATTERN (scan), 0);
+	  data.bb = BLOCK_FOR_INSN (olabel);
+	  data.insn = inner;
+	  note_stores (PATTERN (inner), reorg_set2live, &data);
+	}
+    }
   return redirect_jump (jump, nlabel, 1);
 }
 
