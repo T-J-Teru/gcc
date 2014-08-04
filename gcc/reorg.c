@@ -117,6 +117,8 @@ along with GCC; see the file COPYING3.  If not see
 #include "resource.h"
 #include "params.h"
 #include "tree-pass.h"
+#include "regs.h"
+#include "df.h"
 
 
 /* First, some functions that were used before GCC got a control flow graph.
@@ -1721,13 +1723,54 @@ update_block (rtx_insn *insn, rtx where)
   incr_ticks_for_insn (insn);
 }
 
+typedef struct { basic_block bb; rtx insn; } set2livedata_t;
+
+/* Called via note_stores by reorg_redirect_jump.  */
+static void
+reorg_set2live (rtx x, const_rtx set, void *data_in)
+{
+  set2livedata_t *data = (set2livedata_t*) data_in;
+  int i;
+
+  if (GET_CODE (set) != SET || !REG_P (x)
+      || find_regno_note (data->insn, REG_UNUSED, REGNO (x)))
+    return;
+  for (i = hard_regno_nregs[REGNO (x)][GET_MODE (x)] -1; i >= 0; i--)
+    SET_REGNO_REG_SET (DF_LR_IN (data->bb), REGNO (x) + i);
+}
 /* Similar to REDIRECT_JUMP except that we update the BB_TICKS entry for
-   the basic block containing the jump.  */
+   the basic block containing the jump, and if we are about to delete
+   leading USE-wrapped insns, we update DF_LR_IN accordingly.  */
 
 static int
 reorg_redirect_jump (rtx_jump_insn *jump, rtx nlabel)
 {
   incr_ticks_for_insn (jump);
+  if (!ANY_RETURN_P (JUMP_LABEL (jump))
+      && LABEL_NUSES (JUMP_LABEL (jump)) == 1)
+    {
+      rtx_insn *olabel_insn = as_a <rtx_insn *> (JUMP_LABEL (jump));
+
+      if (NEXT_INSN (olabel_insn)
+	  && NOTE_INSN_BASIC_BLOCK_P (NEXT_INSN (olabel_insn))
+	  && (BLOCK_FOR_INSN (olabel_insn)
+	      == NOTE_BASIC_BLOCK (NEXT_INSN (olabel_insn))))
+	{
+	  for (rtx_insn *scan = olabel_insn;
+	       (scan = next_nonnote_insn (scan));)
+	    {
+	      if (GET_CODE (scan) != INSN
+		  || GET_CODE (PATTERN (scan)) != USE
+		  || !INSN_P (XEXP (PATTERN (scan), 0)))
+		break;
+	      set2livedata_t data;
+	      rtx inner = XEXP (PATTERN (scan), 0);
+	      data.bb = BLOCK_FOR_INSN (olabel_insn);
+	      data.insn = inner;
+	      note_stores (PATTERN (inner), reorg_set2live, &data);
+	    }
+	}
+    }
   return redirect_jump (jump, nlabel, 1);
 }
 
