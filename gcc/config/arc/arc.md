@@ -643,7 +643,7 @@
 ; insns it should lengthen the return insn.
 (define_insn "*movqi_insn"
   [(set (match_operand:QI 0 "move_dest_operand" "=Rcq,Rcq#q,    w,   h, w, w,???w, w,Rcq,  S,!*x,  r,r,Ucm,m,???m")
-	(match_operand:QI 1 "move_src_operand"   " cL,   cP,Rcq#q,hCm1,cL, I,?Rac,?i,  T,Rcq,Usd,Ucm,m,  c,c,?Rac"))]
+	(match_operand:QI 1 "move_src_operand"   " cL,   cP,Rcq#q,hCm1,cL, I,?Rac,?i,  T,Rcq,Usd,Ucm,m,?Rac,c,?Rac"))]
   "register_operand (operands[0], QImode)
    || register_operand (operands[1], QImode)"
   "@
@@ -676,7 +676,7 @@
 
 (define_insn "*movhi_insn"
   [(set (match_operand:HI 0 "move_dest_operand" "=Rcq,Rcq#q,    w,   h, w,w,???w,Rcq#q, w,Rcq,  S,  r,r,Ucm,m,???m,VUsc,VUsc")
-	(match_operand:HI 1 "move_src_operand"    "cL,   cP,Rcq#q,hCm1,cL,I,?Rac,   ?i,?i,  T,Rcq,Ucm,m,  c,c,?Rac, Cm3,   i"))]
+	(match_operand:HI 1 "move_src_operand"    "cL,   cP,Rcq#q,hCm1,cL,I,?Rac,   ?i,?i,  T,Rcq,Ucm,m,?Rac,c,?Rac, Cm3,   i"))]
   "register_operand (operands[0], HImode)
    || register_operand (operands[1], HImode)
    || (CONSTANT_P (operands[1])
