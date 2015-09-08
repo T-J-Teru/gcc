@@ -283,7 +283,7 @@ Target Var(TARGET_BBIT_PEEPHOLE)
 Enable bbit peephole2.
 
 mcase-vector-pcrel
-Target Var(TARGET_CASE_VECTOR_PC_RELATIVE)
+Target Var(TARGET_CASE_VECTOR_PC_RELATIVE) Init(ARC_NPS400 != 0)
 Use pc-relative switch case tables - this enables case table shortening.
 
 mcompact-casesi

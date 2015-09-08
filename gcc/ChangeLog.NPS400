@@ -1,3 +1,10 @@
+2015-09-08  Andrew Burgess  <andrew.burgess@embecosm.com>
+	    Joern Rennecke  <joern.rennecke@embecosm.com>
+	    Noam Camus  <noamca@mellanox.com>
+
+	* config/arc/arc.opt (TARGET_CASE_VECTOR_PC_RELATIVE): Default on
+	for NPS400.
+
 2016-02-02  Joern Rennecke  <joern.rennecke@embecosm.com>
 	    Andrew Burgess  <andrew.burgess@embecosm.com>
 
