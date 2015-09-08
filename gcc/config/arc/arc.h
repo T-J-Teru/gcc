@@ -1194,7 +1194,15 @@ arc_select_cc_mode (OP, X, Y)
    output in the text section, along with the assembler instructions.
    Otherwise, the readonly data section is used.
    This macro is irrelevant if there is no separate readonly data section.  */
-#define JUMP_TABLES_IN_TEXT_SECTION  (flag_pic || CASE_VECTOR_PC_RELATIVE)
+/*#define JUMP_TABLES_IN_TEXT_SECTION  (flag_pic || CASE_VECTOR_PC_RELATIVE)*/
+
+/* We set this as default since we need switch case in fast path to be located
+ * inlined like reset of fast path code and not in rodata which is located
+ * in more slower memory, so now all and not only fast path will bahave like that.
+ * In the future we should add condition to set only if current section is not
+ * normal .text section, to avoid this behaviour on generic code (non fast path).
+ */
+#define JUMP_TABLES_IN_TEXT_SECTION 1
 
 /* For DWARF.  Marginally different than default so output is "prettier"
    (and consistent with above).  */
