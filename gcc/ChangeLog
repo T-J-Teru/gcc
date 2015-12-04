@@ -1,3 +1,8 @@
+2015-12-09  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/arc.c (arc_predicate_delay_insns): Don't assume all
+	jump instructions are conditional.
+
 2015-12-10  Nathan Sidwell  <nathan@acm.org>
 
 	* config/nvptx/nvptx.c (nvptx_function_arg,

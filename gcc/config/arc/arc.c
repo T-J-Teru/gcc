@@ -8670,7 +8670,8 @@ arc_predicate_delay_insns (void)
       gcc_assert (GET_CODE (PATTERN (jump)) == SET);
       gcc_assert (SET_DEST (PATTERN (jump)) == pc_rtx);
       src = SET_SRC (PATTERN (jump));
-      gcc_assert (GET_CODE (src) == IF_THEN_ELSE);
+      if (GET_CODE (src) != IF_THEN_ELSE)
+	continue;
       cond = XEXP (src, 0);
       if (XEXP (src, 2) == pc_rtx)
 	reverse = 0;

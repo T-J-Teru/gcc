@@ -1,3 +1,7 @@
+2015-12-10  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* gcc.target/arc/predicate-delay.c: New file.
+
 2015-12-10  Jan Hubicka  <hubicka@ucw.cz>
 
 	* gcc.c-torture/execute/20010122-1.c: Disable cloning.
