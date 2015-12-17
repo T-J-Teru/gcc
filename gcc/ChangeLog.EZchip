@@ -1,3 +1,8 @@
+2015-12-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/arc.md (*decode_cl): Check that the right operand is
+	a power of 2 integer.
+
 2014-06-27  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* reorg.c (reorg_set2live): New function.

@@ -6583,7 +6583,7 @@
 		     (match_operand:SI 1 "register_operand" "Rrq")
 		     (const_int 5)
 		     (match_operand:SI 3 "const_int_operand" "n"))))]
-  "TARGET_DECODE && IS_POWEROF2_P (INTVAL (operands[1]))"
+  "TARGET_DECODE && IS_POWEROF2_P (INTVAL (operands[2]))"
   "decode.cl %0,%1,%z2,%3"
   [(set_attr "type" "shift")
    (set_attr "length" "4")])
