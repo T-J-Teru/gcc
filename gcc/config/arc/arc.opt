@@ -418,10 +418,6 @@ mcmem
 Target Report Var(TARGET_CMEM) Init(CMEM_DEFAULT)
 Enable use of EZchip xld/xst extension
 
-mdecode
-Target Report Var(TARGET_DECODE)
-Enable use of EZchip decode extension instruction
-
 munaligned-access
 Target Report Var(unaligned_access) Init(UNALIGNED_ACCESS_DEFAULT)
 Enable unaligned word and halfword accesses to packed data.

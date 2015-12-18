@@ -498,4 +498,3 @@
 (define_memory_constraint "ATO"
   "A memory with only a base register"
   (match_operand 0 "mem_noofs_operand"))
-
