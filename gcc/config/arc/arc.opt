@@ -409,3 +409,7 @@ Target Joined
 matomic
 Target Report Mask(ATOMIC)
 Enable atomic instructions.
+
+mdecode
+Target Report Var(TARGET_DECODE)
+Enable use of EZchip decode extension instruction

@@ -123,3 +123,6 @@ extern int regno_clobbered_p (unsigned int, rtx_insn *, machine_mode, int);
 extern int arc_return_slot_offset (void);
 extern bool arc_legitimize_reload_address (rtx *, machine_mode, int, int);
 extern void arc_secondary_reload_conv (rtx, rtx, rtx, bool);
+
+extern int arc_decode_size (rtx mask, rtx shift);
+extern int arc_decode_p_size (rtx mask, rtx shift);

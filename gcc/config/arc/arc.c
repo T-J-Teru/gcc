@@ -1435,7 +1435,8 @@ arc_conditional_register_usage (void)
     {
       if (i < 29)
 	{
-	  if (TARGET_Q_CLASS && ((i <= 3) || ((i >= 12) && (i <= 15))))
+	  if ((TARGET_Q_CLASS || TARGET_RRQ_CLASS)
+	      && ((i <= 3) || ((i >= 12) && (i <= 15))))
 	    arc_regno_reg_class[i] = ARCOMPACT16_REGS;
 	  else
 	    arc_regno_reg_class[i] = GENERAL_REGS;
@@ -1452,10 +1453,12 @@ arc_conditional_register_usage (void)
 	arc_regno_reg_class[i] = NO_REGS;
     }
 
-  /* ARCOMPACT16_REGS is empty, if TARGET_Q_CLASS has not been activated.  */
+  /* ARCOMPACT16_REGS is empty, if TARGET_Q_CLASS or TARGET_RRQ_CLASS has
+     not been activated.  */
   if (!TARGET_Q_CLASS)
     {
-      CLEAR_HARD_REG_SET(reg_class_contents [ARCOMPACT16_REGS]);
+      if (!TARGET_RRQ_CLASS)
+	CLEAR_HARD_REG_SET(reg_class_contents [ARCOMPACT16_REGS]);
       CLEAR_HARD_REG_SET(reg_class_contents [AC16_BASE_REGS]);
     }
 
@@ -10068,6 +10071,38 @@ static bool
 arc_no_speculation_in_delay_slots_p ()
 {
   return true;
+}
+
+/* Determine if MASK and SHIFT are suitable values for decode_i, and if so,
+   return the size of the bit field.  If not, return -1.  */
+
+int
+arc_decode_p_size (rtx mask, rtx shift)
+{
+  HOST_WIDE_INT m = INTVAL (mask);
+  HOST_WIDE_INT s = INTVAL (shift);
+
+  if (s < 0 || s > 31 || m >> s == 0)
+    return -1;
+  if (~m & ((1 << s) - 1))
+    return -1;
+  return exact_log2 (~(m >> s) + 1);
+}
+
+/* Determine if MASK and SHIFTED are suitable values for decode_i, and if so,
+   return the size of the bit field.  If not, return -1.  */
+
+int
+arc_decode_size (rtx mask, rtx shifted)
+{
+  HOST_WIDE_INT m = INTVAL (mask);
+  HOST_WIDE_INT s = exact_log2 (INTVAL (shifted) & 0xffffffff);
+
+  if (s < 0 || s > 31 || m >> s == 0)
+    return -1;
+  if (~m & ((1 << s) - 1))
+    return -1;
+  return exact_log2 (~(m >> s) + 1);
 }
 
 struct gcc_target targetm = TARGET_INITIALIZER;

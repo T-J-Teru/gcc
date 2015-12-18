@@ -5533,6 +5533,9 @@
    (set_attr "predicable" "yes,no,no,yes,no")
    (set_attr "cond"       "canuse,nocond,nocond,canuse,nocond")])
 
+;; experimental decode instructions
+(include "decode.md")
+
 ;; include the arc-FPX instructions
 (include "fpx.md")
 
