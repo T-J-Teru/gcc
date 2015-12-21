@@ -2996,7 +2996,8 @@ arc_print_operand (FILE *file, rtx x, int code)
 
     case 'z':
       if (GET_CODE (x) == CONST_INT)
-	fprintf (file, "%d",exact_log2(INTVAL (x)) );
+	fprintf (file, "%d",
+		 INTVAL (x) == -0x80000000L ? 31 : exact_log2 (INTVAL (x)));
       else
 	output_operand_lossage ("invalid operand to %%z code");
 
