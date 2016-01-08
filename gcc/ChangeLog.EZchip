@@ -1,3 +1,8 @@
+2016-01-08  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/arc.opt (mdiv-rem): Add period to the end.
+	(mcode-density): Likewise.
+
 2014-06-27  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* reorg.c (reorg_set2live): New function.
