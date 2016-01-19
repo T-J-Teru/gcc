@@ -1,3 +1,7 @@
+2016-01-19  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* gcc.target/arc/movh_cl-1.c: New file.
+
 2013-08-09  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* gcc.target/arc/extzv-1.c: Updated expected pattern(s).
