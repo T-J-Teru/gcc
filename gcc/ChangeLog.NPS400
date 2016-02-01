@@ -1,3 +1,15 @@
+2016-02-01  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/arc.md (*loadqi_update): Replace use of 'rI'
+	constraint with separate 'r' and 'Cm2' constraints.
+	(*load_zeroextendqisi_update): Likewise.
+	(*load_signextendqisi_update): Likewise.
+	(*loadhi_update): Likewise.
+	(*load_zeroextendhisi_update): Likewise.
+	(*load_signextendhisi_update): Likewise.
+	(*loadsi_update): Likewise.
+	(*loadsf_update): Likewise.
+
 2015-09-08  Andrew Burgess  <andrew.burgess@embecosm.com>
 	    Joern Rennecke  <joern.rennecke@embecosm.com>
 	    Noam Camus  <noamca@mellanox.com>
