@@ -62,6 +62,10 @@ along with GCC; see the file COPYING3.  If not see
 #undef ASM_APP_OFF
 #undef CC1_SPEC
 
+#ifndef ARC_NPS400
+#define ARC_NPS400 0
+#endif
+
 /* Names to predefine in the preprocessor for this target machine.  */
 #define TARGET_CPU_CPP_BUILTINS()	\
  do {					\
@@ -309,6 +313,10 @@ along with GCC; see the file COPYING3.  If not see
 #define MULTILIB_DEFAULTS { "mARC700" }
 #endif
 
+#ifndef UNALIGNED_ACCESS_DEFAULT
+#define UNALIGNED_ACCESS_DEFAULT 0
+#endif
+
 /* Target machine storage layout.  */
 
 /* We want zero_extract to mean the same
@@ -416,10 +424,13 @@ if (GET_MODE_CLASS (MODE) == MODE_INT		\
 
 /* Set this nonzero if move instructions will actually fail to work
    when given unaligned data.  */
-/* On the ARC the lower address bits are masked to 0 as necessary.  The chip
-   won't croak when given an unaligned address, but the insn will still fail
-   to produce the correct result.  */
-#define STRICT_ALIGNMENT 1
+/* On most ARC cores the lower address bits are masked to 0 as necessary,
+   the chip won't croak when given an unaligned address, but the insn will
+   still fail to produce the correct result.  */
+/* The NPS400 ARC variant supports unaligned access.  Although not without
+   cost, this is still fast enough that we can justify keeping
+   SLOW_UNALIGNED_ACCESS off.  */
+#define STRICT_ALIGNMENT (!unaligned_access)
 
 /* Layout of source language data types.  */
 

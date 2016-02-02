@@ -7137,7 +7137,7 @@ arc_expand_movmem (rtx *operands)
   HOST_WIDE_INT size;
   int align = INTVAL (operands[3]);
   unsigned n_pieces;
-  int piece = align;
+  int piece = STRICT_ALIGNMENT ? align : 4;
   rtx store[2];
   rtx tmpx[2];
   int i;
@@ -7146,7 +7146,7 @@ arc_expand_movmem (rtx *operands)
     return false;
   size = INTVAL (operands[2]);
   /* move_by_pieces_ninsns is static, so we can't use it.  */
-  if (align >= 4)
+  if (align >= 4 || !STRICT_ALIGNMENT)
     {
       if (TARGET_LL64)
 	n_pieces = (size + 4) / 8U + ((size >> 1) & 1) + (size & 1);

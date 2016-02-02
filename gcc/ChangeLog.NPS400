@@ -1,3 +1,14 @@
+2016-02-02  Joern Rennecke  <joern.rennecke@embecosm.com>
+	    Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/arc.h (ARC_NPS400): Define if not already defined.
+	(UNALIGNED_ACCESS_DEFAULT): Define, if not already defined.
+	(STRICT_ALIGNMENT): Make use of unaligned_access var.
+	* config/arc/arc.c (arc_expand_movmem): Take STRICT_ALIGNMENT into
+	account.
+	* config/arc/arc.opt: (munaligned-access): New option.
+	* config/arc/t-nps400: Add munaligned-access to the multilib list.
+
 2016-02-01  Andrew Burgess  <andrew.burgess@embecosm.com>
 
        * config.gcc: Add support for arc*-mellanox-* nps400 targets.
