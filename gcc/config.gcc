@@ -1015,6 +1015,11 @@ arc*-*-elf*)
 	case ${with_endian} in
 	big*)	tm_defines="DRIVER_ENDIAN_SELF_SPECS=\\\"%{!EL:%{!mlittle-endian:-mbig-endian}}\\\" ${tm_defines}"
 	esac
+	case ${target} in
+	arc*-mellanox-*)
+		tm_defines="${tm_defines} ARC_NPS400=1"
+		tmake_file="${tmake_file} arc/t-nps400";;
+	esac
 	;;
 arc*-*-linux-uclibc*)
 	extra_headers="arc-simd.h"
@@ -1039,6 +1044,11 @@ arc*-*-linux-uclibc*)
 	esac
 	case ${with_endian} in
 	big*)	tm_defines="DRIVER_ENDIAN_SELF_SPECS=\\\"%{!EL:%{!mlittle-endian:-mbig-endian}}\\\" ${tm_defines}"
+	esac
+	case ${target} in
+	arc*-mellanox-*)
+		tm_defines="${tm_defines} ARC_NPS400=1"
+		tmake_file="${tmake_file} arc/t-nps400";;
 	esac
         ;;
 arm-wrs-vxworks)

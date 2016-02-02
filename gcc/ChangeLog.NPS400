@@ -1,3 +1,8 @@
+2016-02-01  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+       * config.gcc: Add support for arc*-mellanox-* nps400 targets.
+       * config/arc/t-nps400: New file.
+
 2016-02-02  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* common.opt (ffat-lto-objects): Make this flag default on.
