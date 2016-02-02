@@ -1,3 +1,11 @@
+2016-09-27  Joern Rennecke  <joern.rennecke@embecosm.com>
+            Andrew Burgess  <andrew.burgess@embecosm.com>
+
+        * config/arc/arc.h (STRICT_ALIGNMENT): Make use of
+	unaligned_access config variable.
+        * config/arc/arc.c (arc_expand_movmem): Take STRICT_ALIGNMENT into
+	account.
+
 2013-08-08  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* builtins.c (fold_builtin_constant_p): Consider addresses for

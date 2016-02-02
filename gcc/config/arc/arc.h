@@ -427,12 +427,15 @@ if (GET_MODE_CLASS (MODE) == MODE_INT		\
    && arc_size_opt_level < 3			\
    && (ALIGN) < FASTEST_ALIGNMENT ? FASTEST_ALIGNMENT : (ALIGN))
 
-/* Set this nonzero if move instructions will actually fail to work
-   when given unaligned data.  */
-/* On the ARC the lower address bits are masked to 0 as necessary.  The chip
-   won't croak when given an unaligned address, but the insn will still fail
-   to produce the correct result.  */
-#define STRICT_ALIGNMENT 1
+/* Set STRICT_ALIGNMENT to nonzero if move instructions will actually
+   fail to work when given unaligned data.  */
+/* On most ARC cores the lower address bits are masked to 0 as
+   necessary, the chip won't croak when given an unaligned address,
+   but the insn will still fail to produce the correct result.  */
+/* The NPS400 ARC variant does support unaligned access.  Although
+   these unaligned accesses are not at zero cost, they are not so slow
+   that we define SLOW_UNALIGNED_ACCESS.  */
+#define STRICT_ALIGNMENT (!unaligned_access)
 
 /* Layout of source language data types.  */
 
