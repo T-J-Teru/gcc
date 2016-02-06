@@ -510,7 +510,7 @@
     case SImode: /* Used for BRcc.  */
       return 1;
     /* From combiner.  */
-    case QImode: case HImode: case DImode: case SFmode: case DFmode:
+    case QImode: case HImode: case DImode: case SFmode: case DFmode: case VOIDmode:
       return 0;
     default:
       gcc_unreachable ();
