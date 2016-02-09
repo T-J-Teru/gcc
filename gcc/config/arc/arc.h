@@ -112,6 +112,7 @@ along with GCC; see the file COPYING3.  If not see
 		    ? "__BIG_ENDIAN__" : "__LITTLE_ENDIAN__"); \
     if (TARGET_BIG_ENDIAN)		\
       builtin_define ("__big_endian__"); \
+    builtin_define ("__NPS400__");	 \
 } while(0)
 
 #if DEFAULT_LIBC == LIBC_UCLIBC
