@@ -1,3 +1,7 @@
+2016-02-08  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* conig/arc/arc.h (TARGET_CPU_CPP_BUILTINS): Add __NPS400__.
+
 2016-01-19  Joern Rennecke  <joern.rennecke@embecosm.com>
 	    Andrew Burgess  <andrew.burgess@embecosm.com>
 
