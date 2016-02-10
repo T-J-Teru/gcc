@@ -1,3 +1,7 @@
+2016-02-10  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* gcc.target/arc/movb-1.c: Update expected results.
+
 2016-02-06  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* gcc.target/arc/ezchip-1.c: New file.
