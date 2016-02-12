@@ -151,7 +151,7 @@ rtx stack_limit_rtx;
 /* True if the user has tagged the function with the 'section'
    attribute.  */
 
-bool user_defined_section_attribute = false;
+bool func_with_user_defined_section_attribute = false;
 
 struct target_flag_state default_target_flag_state;
 #if SWITCHABLE_TARGET

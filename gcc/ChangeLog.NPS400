@@ -1,3 +1,17 @@
+2016-02-12  Joern Rennecke  <joern.rennecke@embecosm.com>
+	    Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* bb-reorder.c: Update comment on 'toplev.h' include.
+	(pass_partition_blocks::gate): Update
+	user_defined_section_attribute to
+	func_with_user_defined_section_attribute.
+	* c-family/c-common.c (handle_section_attribute): Update
+	user_defined_section_attribute to
+	func_with_user_defined_section_attribute.
+	* final.c: Likewise.
+	* toplev.c: Likewise.
+	* toplev.h: Likewise.
+
 2013-08-08  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* builtins.c (fold_builtin_constant_p): Consider addresses for

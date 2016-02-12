@@ -75,7 +75,7 @@ extern unsigned local_tick;
 /* True if the user has tagged the function with the 'section'
    attribute.  */
 
-extern bool user_defined_section_attribute;
+extern bool func_with_user_defined_section_attribute;
 
 /* See toplev.c.  */
 extern int flag_rerun_cse_after_global_opts;

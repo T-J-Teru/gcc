@@ -106,7 +106,7 @@
 #include "output.h"
 #include "expr.h"
 #include "params.h"
-#include "toplev.h" /* user_defined_section_attribute */
+#include "toplev.h" /* func_with_user_defined_section_attribute */
 #include "tree-pass.h"
 #include "cfgrtl.h"
 #include "cfganal.h"
@@ -2890,7 +2890,7 @@ pass_partition_blocks::gate (function *fun)
 	     we are going to omit the reordering.  */
 	  && optimize_function_for_speed_p (fun)
 	  && !DECL_COMDAT_GROUP (current_function_decl)
-	  && !user_defined_section_attribute);
+	  && !func_with_user_defined_section_attribute);
 }
 
 unsigned
