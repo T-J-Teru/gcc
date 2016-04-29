@@ -887,7 +887,7 @@
 ; since this is about constants, reload shouldn't care.
 (define_insn "*tst_bitfield_tst"
   [(set (match_operand:CC_ZN 0 "cc_set_register" "")
-	(match_operator 4 "zn_compare_operator"
+	(match_operator:CC_ZN 4 "zn_compare_operator"
 	  [(zero_extract:SI
 	     (match_operand:SI 1 "register_operand"  "c")
 	     (match_operand:SI 2 "const_int_operand" "n")
@@ -905,7 +905,7 @@
 ; Likewise for asr.f.
 (define_insn "*tst_bitfield_asr"
   [(set (match_operand:CC_ZN 0 "cc_set_register" "")
-	(match_operator 4 "zn_compare_operator"
+	(match_operator:CC_ZN 4 "zn_compare_operator"
 	  [(zero_extract:SI
 	     (match_operand:SI 1 "register_operand"  "c")
 	     (match_operand:SI 2 "const_int_operand" "n")
@@ -920,7 +920,7 @@
 
 (define_insn "*tst_bitfield"
   [(set (match_operand:CC_ZN 0 "cc_set_register" "")
-	(match_operator 5 "zn_compare_operator"
+	(match_operator:CC_ZN 5 "zn_compare_operator"
 	  [(zero_extract:SI
 	     (match_operand:SI 1 "register_operand" "%Rcqq,c,  c,Rrq,c")
 	     (match_operand:SI 2 "const_int_operand"    "N,N,  n,Cbn,n")
@@ -6157,7 +6157,7 @@
 	(zero_extract:SI (match_dup 1)
 			 (match_dup 2)
 			 (match_operand:SI 4 "const_int_operand" "")))
-   (set (match_dup 1) (match_operand 8))
+   (set (match_dup 1) (match_operand:SI 8))
    (set (zero_extract:SI (match_dup 0)
 			 (match_operand:SI 5 "const_int_operand" "")
 			 (match_operand:SI 6 "const_int_operand" ""))
@@ -6172,6 +6172,20 @@
 	      (set (zero_extract:SI (match_dup 0) (match_dup 5) (match_dup 6))
 		   (zero_extract:SI (match_dup 1) (match_dup 5) (match_dup 7)))])
    (match_dup 1)])
+
+(define_peephole2
+  [(set (match_operand:SI 0 "register_operand" "")
+        (zero_extract:SI (match_dup 0)
+			 (match_operand:SI 1 "const_int_operand" "")
+			 (match_operand:SI 2 "const_int_operand" "")))
+   (set (zero_extract:SI (match_operand:SI 3 "register_operand" "")
+			 (match_dup 1)
+                         (match_dup 2))
+	(match_dup 0))]
+  "TARGET_NPS_BITOPS
+   && !reg_overlap_mentioned_p (operands[0], operands[3])"
+  [(set (zero_extract:SI (match_dup 3) (match_dup 1) (match_dup 2))
+        (zero_extract:SI (match_dup 0) (match_dup 1) (match_dup 2)))])
 
 ;; include the arc-FPX instructions
 (include "fpx.md")
