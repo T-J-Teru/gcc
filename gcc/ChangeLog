@@ -1,3 +1,10 @@
+2016-06-28  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* genrecog.c (special_predicate_operand_p): New function.
+	(predicate_name): Move function.
+	(validate_pattern): Don't warn about missing mode for all
+	define_special_predicate predicates.
+
 2016-06-14  Andreas Tobler  <andreast@gcc.gnu.org>
 
 	* config/arm/freebsd.h: Only enable unaligned access for armv6 on
