@@ -1,3 +1,7 @@
+2016-06-15  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* gcc.target/arc/switch-1.c: New file.
+
 2016-06-14  Jakub Jelinek  <jakub@redhat.com>
 
 	PR c++/71528

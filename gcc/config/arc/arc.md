@@ -3948,6 +3948,7 @@
   int unalign = arc_get_unalign ();
   rtx xop[3];
   const char *s;
+  int vec_offset = TARGET_V2 ? 12 : 10;
 
   xop[0] = operands[0];
   xop[2] = operands[2];
@@ -3960,11 +3961,11 @@
 	 2 of these are for alignment, and are anticipated in the length
 	 of the ADDR_DIFF_VEC.  */
       if (unalign && !satisfies_constraint_Rcq (xop[0]))
-	s = \"add2 %2,pcl,%0\n\tld_s %2,[%2,12]\";
+	s = \"add2 %2,pcl,%0\n\tld_s %2,[%2,12]\";   /* Length = 6 bytes.  */
       else if (unalign)
-	s = \"add_s %2,%0,2\n\tld.as %2,[pcl,%2]\";
+	s = \"add_s %2,%0,2\n\tld.as %2,[pcl,%2]\";  /* Length = 6 bytes.  */
       else
-	s = \"add %2,%0,2\n\tld.as %2,[pcl,%2]\";
+	s = \"add %2,%0,2\n\tld.as %2,[pcl,%2]\";    /* Length = 8 bytes.  */
       arc_clear_unalign ();
       break;
     case HImode:
@@ -3972,26 +3973,26 @@
 	{
 	  if (satisfies_constraint_Rcq (xop[0]))
 	    {
-	      s = \"add_s %2,%0,%1\n\tld%_.as %2,[pcl,%2]\";
-	      xop[1] = GEN_INT ((10 - unalign) / 2U);
+	      s = \"add_s %2,%0,%1\n\tld%_.as %2,[pcl,%2]\";  /* Length = 6 bytes.  */
+	      xop[1] = GEN_INT ((vec_offset - unalign) / 2U);
 	    }
 	  else
 	    {
-	      s = \"add1 %2,pcl,%0\n\tld%__s %2,[%2,%1]\";
-	      xop[1] = GEN_INT (10 + unalign);
+	      s = \"add1 %2,pcl,%0\n\tld%__s %2,[%2,%1]\";    /* Length = 6 bytes.  */
+	      xop[1] = GEN_INT (vec_offset + unalign);
 	    }
 	}
       else
 	{
 	  if (satisfies_constraint_Rcq (xop[0]))
 	    {
-	      s = \"add_s %2,%0,%1\n\tld%_.x.as %2,[pcl,%2]\";
-	      xop[1] = GEN_INT ((10 - unalign) / 2U);
+	      s = \"add_s %2,%0,%1\n\tld%_.x.as %2,[pcl,%2]\";  /* Length = 6 bytes.  */
+	      xop[1] = GEN_INT ((vec_offset - unalign) / 2U);
 	    }
 	  else
 	    {
-	      s = \"add1 %2,pcl,%0\n\tld%__s.x %2,[%2,%1]\";
-	      xop[1] = GEN_INT (10 + unalign);
+	      s = \"add1 %2,pcl,%0\n\tld%__s.x %2,[%2,%1]\";    /* Length = 6 bytes.  */
+	      xop[1] = GEN_INT (vec_offset + unalign);
 	    }
 	}
       arc_toggle_unalign ();
@@ -3999,17 +4000,18 @@
     case QImode:
       if (ADDR_DIFF_VEC_FLAGS (diff_vec).offset_unsigned)
 	{
-	  if ((rtx_equal_p (xop[2], xop[0])
-	       || find_reg_note (insn, REG_DEAD, xop[0]))
+	  if (!TARGET_V2
+              && (rtx_equal_p (xop[2], xop[0])
+	          || find_reg_note (insn, REG_DEAD, xop[0]))
 	      && satisfies_constraint_Rcq (xop[0]))
 	    {
-	      s = \"add_s %0,%0,pcl\n\tldb_s %2,[%0,%1]\";
-	      xop[1] = GEN_INT (8 + unalign);
+	      s = \"add %0,%0,pcl\n\tldb_s %2,[%0,%1]\";        /* Length = 6 bytes.  */
+	      xop[1] = GEN_INT ((vec_offset - 2) + unalign);
 	    }
 	  else
 	    {
-	      s = \"add %2,%0,pcl\n\tldb_s %2,[%2,%1]\";
-	      xop[1] = GEN_INT (10 + unalign);
+	      s = \"add %2,%0,pcl\n\tldb_s %2,[%2,%1]\";        /* Length = 6 bytes.  */
+	      xop[1] = GEN_INT (vec_offset + unalign);
 	      arc_toggle_unalign ();
 	    }
 	}
@@ -4017,14 +4019,14 @@
 		|| find_reg_note (insn, REG_DEAD, xop[0]))
 	       && satisfies_constraint_Rcq (xop[0]))
 	{
-	  s = \"add_s %0,%0,%1\n\tldb.x %2,[pcl,%0]\";
-	  xop[1] = GEN_INT (10 - unalign);
+	  s = \"add_s %0,%0,%1\n\tldb.x %2,[pcl,%0]\";   /* Length = 6 bytes.  */
+	  xop[1] = GEN_INT (vec_offset - unalign);
 	  arc_toggle_unalign ();
 	}
       else
 	{
 	  /* ??? Length is 12.  */
-	  s = \"add %2,%0,%1\n\tldb.x %2,[pcl,%2]\";
+	  s = \"add %2,%0,%1\n\tldb.x %2,[pcl,%2]\";     /* Length = 8 bytes.  */
 	  xop[1] = GEN_INT (8 + unalign);
 	}
       break;
@@ -4032,9 +4034,13 @@
       gcc_unreachable ();
     }
   output_asm_insn (s, xop);
-  return \"add_s %2,%2,pcl\n\tj_s%* [%2]\";
+  if (TARGET_V2)
+    return \"add %2,%2,pcl\n\tj_s%* [%2]\";      /* Length = 6 bytes.  */
+  else
+    return \"add_s %2,%2,pcl\n\tj_s%* [%2]\";    /* Length = 4 bytes.  */
 }"
-  [(set_attr "length" "10")
+  [(set (attr "length")
+        (if_then_else (match_test "TARGET_V2") (const_int 12) (const_int 10)))
    (set_attr "type" "jump")
    (set_attr "iscompact" "true")
    (set_attr "cond" "nocond")])
