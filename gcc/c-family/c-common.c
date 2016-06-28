@@ -7751,8 +7751,6 @@ handle_section_attribute (tree *node, tree ARG_UNUSED (name), tree args,
       goto fail;
     }
 
-  user_defined_section_attribute = true;
-
   if (!VAR_OR_FUNCTION_DECL_P (decl))
     {
       error ("section attribute not allowed for %q+D", *node);

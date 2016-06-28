@@ -1,3 +1,9 @@
+2016-09-14  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* gcc.dg/tree-prof/section-attr-1.c: New file.
+	* gcc.dg/tree-prof/section-attr-2.c: New file.
+	* gcc.dg/tree-prof/section-attr-3.c: New file.
+
 2016-09-14  Jakub Jelinek  <jakub@redhat.com>
 
 	PR sanitizer/68260
