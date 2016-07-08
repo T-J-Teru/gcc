@@ -3890,7 +3890,10 @@
   switch (GET_MODE (diff_vec))
     {
     case SImode:
-      return \"ld.as %0,[%1,%2]%&\";
+      if ((which_alternative == 0) && TARGET_CODE_DENSITY)
+	return \"ld_s.as %0,[%1,%2]%&\";
+      else
+	return \"ld.as %0,[%1,%2]%&\";
     case HImode:
       if (ADDR_DIFF_VEC_FLAGS (diff_vec).offset_unsigned)
 	return \"ld%_.as %0,[%1,%2]\";
