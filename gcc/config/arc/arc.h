@@ -101,6 +101,8 @@ along with GCC; see the file COPYING3.  If not see
 %{mcpu=ARC600:-mARC600} \
 %{mcpu=ARC601:-mARC601} \
 %{mcpu=ARC700:-mARC700} \
+%{mcpu=NPS400:-mcpu=nps400} \
+%{mcpu=nps400:-mcpu=nps400} \
 %{mcpu=ARC700:-mEA} \
 %{!mcpu=*:" ASM_DEFAULT "} \
 %{mbarrel-shifter} %{mno-mpy} %{mmul64} %{mmul32x16:-mdsp-packa} %{mnorm} \
