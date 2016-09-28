@@ -148,6 +148,8 @@ along with GCC; see the file COPYING3.  If not see
 %{EB:-mbig-endian} %{EL:-mlittle-endian} \
 "
 
+/* These defaults are fine for arc700 and nps400 when using the old
+   binutils.  */
 #define ASM_DEFAULT "-mARC700 -mEA"
 
 #define ASM_SPEC  "\
@@ -155,9 +157,9 @@ along with GCC; see the file COPYING3.  If not see
 %{mcpu=ARC600:-mARC600} \
 %{mcpu=ARC601:-mARC601} \
 %{mcpu=ARC700:-mARC700} \
-%{mcpu=NPS400:-mcpu=nps400} \
-%{mcpu=nps400:-mcpu=nps400} \
 %{mcpu=ARC700:-mEA} \
+%{mcpu=NPS400:-mcpu=arc700} \
+%{mcpu=nps400:-mcpu=arc700} \
 %{!mcpu=*:" ASM_DEFAULT "} \
 %{mbarrel-shifter} %{mno-mpy} %{mmul64} %{mmul32x16:-mdsp-packa} %{mnorm} \
 %{mswap} %{mEA} %{mmin-max} %{mspfp*} %{mdpfp*} %{mfpu=fpuda*:-mfpuda} \

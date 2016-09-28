@@ -1,3 +1,10 @@
+2016-09-28  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/arc.h (ASM_SPEC): Use arc700 as the assembler cpu
+	when assembling nps400 code.
+	* config/arc/arc.c (arc_init): Use ARC700 as the cpu string
+	embeded into the assembler file for nps400 code.
+
 2016-09-27  Joern Rennecke  <joern.rennecke@embecosm.com>
             Andrew Burgess  <andrew.burgess@embecosm.com>
 
