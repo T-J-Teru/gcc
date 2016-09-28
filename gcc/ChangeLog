@@ -1,5 +1,15 @@
 2016-09-28  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* config/arc/arc.h (MULTILIB_DEFAULTS): Setup for nps400 if
+	appropriate.
+	* config/arc/arc.c (arc_init): Setup the
+	TARGET_CASE_VECTOR_PC_RELATIVE if we're compiling for nps400.
+	(arc_override_options): Set default cpu type for nps400.
+	* config.gcc: Add nps400 to the with-cpu list, and define
+	TARGET_CPU_${with_cpu} as appropriate.
+
+2016-09-28  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* config/arc/arc.h (ASM_SPEC): Use arc700 as the assembler cpu
 	when assembling nps400 code.
 	* config/arc/arc.c (arc_init): Use ARC700 as the cpu string

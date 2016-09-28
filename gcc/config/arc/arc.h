@@ -305,7 +305,11 @@ along with GCC; see the file COPYING3.  If not see
 #define arc_cpu_attr ((enum attr_cpu)arc_cpu)
 
 #ifndef MULTILIB_DEFAULTS
+#ifdef TARGET_CPU_nps400
+#define MULTILIB_DEFAULTS { "-mcpu=nps400" }
+#else
 #define MULTILIB_DEFAULTS { "mARC700" }
+#endif
 #endif
 
 #ifndef UNALIGNED_ACCESS_DEFAULT

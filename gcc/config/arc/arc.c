@@ -693,6 +693,8 @@ arc_init (void)
     case PROCESSOR_NPS400:
       arc_cpu_string = "ARC700";
       tune_dflt = TUNE_ARC700_4_2_STD;
+      if (!(global_options_set.x_TARGET_CASE_VECTOR_PC_RELATIVE))
+	TARGET_CASE_VECTOR_PC_RELATIVE = 1;
       break;
 
     case PROCESSOR_ARCEM:
@@ -853,7 +855,11 @@ static void
 arc_override_options (void)
 {
   if (arc_cpu == PROCESSOR_NONE)
+#ifdef TARGET_CPU_nps400
+    arc_cpu = PROCESSOR_NPS400;
+#else
     arc_cpu = PROCESSOR_ARC700;
+#endif
 
   if (arc_size_opt_level == 3)
     optimize_size = 1;
