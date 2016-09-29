@@ -242,6 +242,7 @@ along with GCC; see the file COPYING3.  If not see
 #define TARGET_ARC601 (arc_cpu == PROCESSOR_ARC601)
 #define TARGET_ARC700 (arc_cpu == PROCESSOR_ARC700	\
 		       || arc_cpu == PROCESSOR_NPS400)
+#define TARGET_NPS400 (arc_cpu == PROCESSOR_NPS400)
 #define TARGET_EM     (arc_cpu == PROCESSOR_ARCEM)
 #define TARGET_HS     (arc_cpu == PROCESSOR_ARCHS)
 #define TARGET_V2							\
