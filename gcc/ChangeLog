@@ -1,3 +1,7 @@
+2016-10-13  Claudiu Zissulescu  <claziss@synopsys.com>
+
+	* config/arc/arc.h (INSN_LENGTH_ALIGNMENT): Change.
+
 2016-09-29  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* config/arc/arc-c.def: Add __NPS400__ define.
