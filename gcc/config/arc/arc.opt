@@ -53,12 +53,75 @@ mARC700
 Target Report
 Same as -mA7.
 
-TargetVariable
-int arc_mpy_option = DEFAULT_arc_mpy_option
-
 mmpy-option=
-Target RejectNegative Joined
+Target RejectNegative Joined Enum(arc_mpy) Var(arc_mpy_option) Init(DEFAULT_arc_mpy_option)
 -mmpy-option=MPY Compile ARCv2 code with a multiplier design option.
+
+Enum
+Name(arc_mpy) Type(int)
+
+EnumValue
+Enum(arc_mpy) String(0) Value(0)
+
+EnumValue
+Enum(arc_mpy) String(none) Value(0) Canonical
+
+EnumValue
+Enum(arc_mpy) String(1) Value(1)
+
+EnumValue
+Enum(arc_mpy) String(w) Value(1) Canonical
+
+EnumValue
+Enum(arc_mpy) String(2) Value(2)
+
+EnumValue
+Enum(arc_mpy) String(mpy) Value(2)
+
+EnumValue
+Enum(arc_mpy) String(wlh1) Value(2) Canonical
+
+EnumValue
+Enum(arc_mpy) String(3) Value(3)
+
+EnumValue
+Enum(arc_mpy) String(wlh2) Value(3) Canonical
+
+EnumValue
+Enum(arc_mpy) String(4) Value(4)
+
+EnumValue
+Enum(arc_mpy) String(wlh3) Value(4) Canonical
+
+EnumValue
+Enum(arc_mpy) String(5) Value(5)
+
+EnumValue
+Enum(arc_mpy) String(wlh4) Value(5) Canonical
+
+EnumValue
+Enum(arc_mpy) String(6) Value(6)
+
+EnumValue
+Enum(arc_mpy) String(wlh5) Value(6) Canonical
+
+EnumValue
+Enum(arc_mpy) String(7) Value(7)
+
+EnumValue
+Enum(arc_mpy) String(plus_dmpy) Value(7) Canonical
+
+EnumValue
+Enum(arc_mpy) String(8) Value(8)
+
+EnumValue
+Enum(arc_mpy) String(plus_macd) Value(8) Canonical
+
+EnumValue
+Enum(arc_mpy) String(9) Value(9)
+
+EnumValue
+Enum(arc_mpy) String(plus_qmacw) Value(9) Canonical
 
 mdiv-rem
 Target Report Mask(DIVREM)

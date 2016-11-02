@@ -71,7 +71,6 @@ arc_handle_option (struct gcc_options *opts,
   int value = decoded->value;
   const char *arg = decoded->arg;
   static int mcpu_seen = PROCESSOR_NONE;
-  char *p;
 
   switch (code)
     {
@@ -85,45 +84,8 @@ arc_handle_option (struct gcc_options *opts,
       break;
 
     case OPT_mmpy_option_:
-      p = ASTRDUP (arg);
-
-      if (!strcmp (p, "0")
-	  || !strcmp (p, "none"))
-	opts->x_arc_mpy_option = 0;
-      else if (!strcmp (p, "1")
-	  || !strcmp (p, "w"))
-	{
-	  opts->x_arc_mpy_option = 1;
-	  warning_at (loc, 0, "Unsupported value for mmpy-option");
-	}
-      else if (!strcmp (p, "2")
-	       || !strcmp (p, "mpy")
-	       || !strcmp (p, "wlh1"))
-	opts->x_arc_mpy_option = 2;
-      else if (!strcmp (p, "3")
-	       || !strcmp (p, "wlh2"))
-	opts->x_arc_mpy_option = 3;
-      else if (!strcmp (p, "4")
-	       || !strcmp (p, "wlh3"))
-	opts->x_arc_mpy_option = 4;
-      else if (!strcmp (p, "5")
-	       || !strcmp (p, "wlh4"))
-	opts->x_arc_mpy_option = 5;
-      else if (!strcmp (p, "6")
-	       || !strcmp (p, "wlh5"))
-	opts->x_arc_mpy_option = 6;
-      else if (!strcmp (p, "7")
-	       || !strcmp (p, "plus_dmpy"))
-	opts->x_arc_mpy_option = 7;
-      else if (!strcmp (p, "8")
-	       || !strcmp (p, "plus_macd"))
-	opts->x_arc_mpy_option = 8;
-      else if (!strcmp (p, "9")
-	       || !strcmp (p, "plus_qmacw"))
-	opts->x_arc_mpy_option = 9;
-      else
-	error_at (loc, "unknown value %qs for -mmpy-option", arg);
-
+      if (opts->x_arc_mpy_option == 1)
+	warning_at (loc, 0, "Unsupported value for mmpy-option");
       break;
 
     default:
