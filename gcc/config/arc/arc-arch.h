@@ -68,6 +68,9 @@ typedef struct
   /* Architecture class.  */
   enum base_architecture arch;
 
+  /* Specific processor type.  */
+  enum processor_type processor;
+
   /* Specific flags.  */
   const unsigned long long flags;
 
@@ -108,12 +111,12 @@ const arc_arch_t arc_arch_types[] =
 
 const arc_cpu_t arc_cpu_types[] =
   {
-    {"none", BASE_ARCH_NONE, 0, ARC_TUNE_NONE},
+    {"none", BASE_ARCH_NONE, PROCESSOR_NONE, 0, ARC_TUNE_NONE},
 #define ARC_CPU(NAME, ARCH, FLAGS, TUNE)	\
-    {#NAME, BASE_ARCH_##ARCH, FLAGS, ARC_TUNE_##TUNE},
+    {#NAME, BASE_ARCH_##ARCH, PROCESSOR_##NAME, FLAGS, ARC_TUNE_##TUNE},
 #include "arc-cpus.def"
 #undef ARC_CPU
-    {NULL, BASE_ARCH_END, 0, ARC_TUNE_NONE}
+    {NULL, BASE_ARCH_END, PROCESSOR_NONE, 0, ARC_TUNE_NONE}
   };
 
 #endif

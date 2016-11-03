@@ -64,7 +64,10 @@ arc_cpu_to_as (int argc, const char **argv)
     case BASE_ARCH_hs:
       return "-mcpu=archs";
     case BASE_ARCH_700:
-      return "-mcpu=arc700 -mEA";
+      if (arc_selected_cpu->processor == PROCESSOR_nps400)
+	return "-mcpu=nps400 -mEA";
+      else
+	return "-mcpu=arc700 -mEA";
     case BASE_ARCH_6xx:
       if (arc_selected_cpu->flags & FL_MUL64)
 	return "-mcpu=arc600 -mmul64 -mnorm";

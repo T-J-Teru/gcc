@@ -800,7 +800,10 @@ arc_override_options (void)
       arc_cpu_string = "HS";
       break;
     case BASE_ARCH_700:
-      arc_cpu_string = "ARC700";
+      if (arc_selected_cpu->processor == PROCESSOR_nps400)
+	arc_cpu_string = "NPS400";
+      else
+	arc_cpu_string = "ARC700";
       break;
     case BASE_ARCH_6xx:
       arc_cpu_string = "ARC600";
