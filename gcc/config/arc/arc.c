@@ -4631,6 +4631,20 @@ arc_rtx_costs (rtx x, machine_mode mode, int outer_code,
       if (mode == SImode)
 	*total += COSTS_N_INSNS (1) - 1;
       return false;
+    case SET:
+      if (TARGET_NPS_CMEM
+         && ((GET_CODE(SET_SRC(x)) == MEM && GET_CODE(SET_DEST(x)) == REG)
+             || (GET_CODE(SET_SRC(x)) == REG && GET_CODE(SET_DEST(x)) == MEM)))
+      {
+        /* Use XLD/XST for CMEM addresses with no extra cost */
+        rtx memop = GET_CODE(SET_SRC(x)) == MEM ? XEXP(SET_SRC(x), 0) : XEXP(SET_DEST(x), 0);
+        if (cmem_address (memop, SImode))
+        {
+          *total += COSTS_N_INSNS (1);
+          return true;
+        }
+      }
+      /* Fall through.  */
     default:
       return false;
     }
