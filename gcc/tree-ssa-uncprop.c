@@ -392,7 +392,7 @@ uncprop_into_successor_phis (basic_block bb)
 
 		  if (gimple_can_coalesce_p (equiv, res))
 		    {
-		      SET_PHI_ARG_DEF (phi, e->dest_idx, equiv);
+		      //SET_PHI_ARG_DEF (phi, e->dest_idx, equiv);
 		      break;
 		    }
 		}
