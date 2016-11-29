@@ -321,6 +321,12 @@ doloop_valid_p (struct loop *loop, struct niter_desc *desc)
 	    }
 	}
     }
+
+  if ((loop->header->frequency / 8 ) > loop->latch->frequency) {
+    result = false;
+    goto cleanup;
+  }
+
   result = true;
 
 cleanup:
