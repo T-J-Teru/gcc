@@ -1,3 +1,8 @@
+2017-01-20  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/arc.h (CPP_SPEC): Remove unneeded __NPS400__
+	definition.
+
 2016-09-29  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* config/arc/arc-c.def: Add __NPS400__ define.
