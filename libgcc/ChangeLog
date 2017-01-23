@@ -1,3 +1,10 @@
+2017-01-23  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/dp-hack.h (ARC_OPTFPE): Avoid non-portable use of
+	'defined' within macro expansion.
+	* config/arc/fp-hack.h (ARC_OPTFPE): Likewise.
+	* config/arc/lib1funcs.S (ARC_OPTFPE): Likewise.
+
 2017-01-20  Jiong Wang  <jiong.wang@arm.com>
 
 	* config/aarch64/linux-unwind.h: Always include aarch64-unwind.h.
