@@ -1261,7 +1261,11 @@ SYM(__ld_r13_to_r14_ret):
 
 #endif /* L_millicodethunk_ret */
 
-#define ARC_OPTFPE (defined (__ARC700__) || defined (__ARC_FPX_QUARK__))
+#if (defined (__ARC700__) || defined (__ARC_FPX_QUARK__))
+#define ARC_OPTFPE 1
+#else
+#define ARC_OPTFPE 0
+#endif
 
 #if ARC_OPTFPE
 #ifdef  L_adddf3

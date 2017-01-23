@@ -1,3 +1,10 @@
+2017-01-23  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/dp-hack.h (ARC_OPTFPE): Avoid non-portable use of
+	'defined' within macro expansion.
+	* config/arc/fp-hack.h (ARC_OPTFPE): Likewise.
+	* config/arc/lib1funcs.S (ARC_OPTFPE): Likewise.
+
 2017-09-01  Olivier Hainque  <hainque@adacore.com>
 
 	* config.host (*-*-vxworks7): Widen scope to vxworks7*.
