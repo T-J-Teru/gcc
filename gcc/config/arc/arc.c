@@ -6631,7 +6631,7 @@ arc_reorg (void)
 	  rtx_insn *next = NULL;
 	  rtx op0 = XEXP (XVECEXP (PATTERN (insn), 0, 1), 0);
 	  HOST_WIDE_INT loop_end_id
-	    = -INTVAL (XEXP (XVECEXP (PATTERN (insn), 0, 4), 0));
+	    = INTVAL (XEXP (XVECEXP (PATTERN (insn), 0, 4), 0));
 	  int seen_label = 0;
 
 	  for (lp = prev;
