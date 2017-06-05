@@ -11,4 +11,4 @@ foo ()
   b = a;
 }
 
-/* { dg-final { scan-assembler "st r\[0-9\]+,\\\[@a\\\]\[^\n\]*\n\[ 
+/* { dg-final { scan-assembler "st r\[0-9\]+,\\\[@a\\\]\[^\n\]*\n\[ \t\]+nop_s\[^\n\]*\n\[ \t\]+nop_s\[^\n\]*\n\[ \t\]+ld r\[0-9\]+,\\\[@a\\\]" } } */
