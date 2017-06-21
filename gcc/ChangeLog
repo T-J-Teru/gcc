@@ -1,3 +1,8 @@
+2017-06-21  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/arc/arc.md (doloop_begin_i): Increase length of some loop
+	variants.
+
 2016-09-29  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* config/arc/arc-c.def: Add __NPS400__ define.
