@@ -2312,6 +2312,19 @@ riscv_flatten_aggregate_field (const_tree type,
 	    if (n < 0)
 	      return -1;
 	  }
+
+      /* An empty aggregate will have size 1 byte in C++ but 0 in C
+	 (thanks to a GCC extension).  If by this point N is still 0, but
+	 the size is non-zero then we must have an empty aggregate, and we
+	 should ensure it is passed as per the ABI.  */
+      if (n == 0 && tree_to_shwi (TYPE_SIZE_UNIT (type)) > 0)
+	{
+	  gcc_assert (tree_to_shwi (TYPE_SIZE_UNIT (type)) == 1);
+	  fields[n].type = type;
+	  fields[n].offset = offset;
+	  ++n;
+	}
+
       return n;
 
     case ARRAY_TYPE:
@@ -2432,7 +2445,11 @@ riscv_pass_aggregate_in_fpr_and_gpr_p (const_tree type,
   for (int i = 0; i < n; i++)
     {
       num_float += SCALAR_FLOAT_TYPE_P (fields[i].type);
-      num_int += INTEGRAL_TYPE_P (fields[i].type);
+      /* We only see RECORD_TYPE here if the type has no fields but has
+	 non-zero size, as is the case for a C++ empty struct, these
+	 should be passed as integer arguments.  */
+      num_int += (INTEGRAL_TYPE_P (fields[i].type)
+		  || TREE_CODE (fields[i].type) == RECORD_TYPE);
     }
 
   return num_int == 1 && num_float == 1;

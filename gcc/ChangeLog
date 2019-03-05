@@ -1,3 +1,11 @@
+2019-03-05  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* config/riscv/riscv.c (riscv_flatten_aggregate_field): Identify
+	empty structs with non-zero size, and record these as fields that
+	need passing.
+	(riscv_pass_aggregate_in_fpr_and_gpr_p): Count structs seen at
+	this point as integer arguments.
+
 2019-03-04  Wilco Dijkstra  <wdijkstr@arm.com>
 
 	PR tree-optimization/89437
