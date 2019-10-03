@@ -1,3 +1,8 @@
+2019-10-03  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* contrib/dg-extract-results.sh: Add support for KPASS.
+	* contrib/dg-extract-results.py: Likewise.
+
 2019-10-01  Frederik Harwath <frederik@codesourcery.com>
 
 	* MAINTAINERS: Add myself to Write After Approval
