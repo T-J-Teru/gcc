@@ -9618,6 +9618,16 @@ build_common_builtin_nodes (void)
 			"__builtin_nonlocal_goto",
 			ECF_NORETURN | ECF_NOTHROW);
 
+  ftype = build_function_type_list (void_type_node, NULL_TREE);
+  local_define_builtin ("__builtin_nested_func_ptr_created", ftype,
+			BUILT_IN_NESTED_PTR_CREATED,
+			"__builtin_nested_func_ptr_created", ECF_NOTHROW);
+
+  ftype = build_function_type_list (void_type_node, NULL_TREE);
+  local_define_builtin ("__builtin_nested_func_ptr_deleted", ftype,
+			BUILT_IN_NESTED_PTR_DELETED,
+			"__builtin_nested_func_ptr_deleted", ECF_NOTHROW);
+
   ftype = build_function_type_list (void_type_node,
 				    ptr_type_node, ptr_type_node, NULL_TREE);
   local_define_builtin ("__builtin_setjmp_setup", ftype,

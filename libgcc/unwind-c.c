@@ -244,3 +244,19 @@ __gcc_personality_seh0 (PEXCEPTION_RECORD ms_exc, void *this_frame,
 				ms_disp, __gcc_personality_imp);
 }
 #endif /* SEH */
+
+
+extern void __builtin_nested_func_ptr_created (void);
+extern void __builtin_nested_func_ptr_deleted (void);
+
+void
+__builtin_nested_func_ptr_created (void)
+{
+  printf ("GCC: Generating a nested function pointer\n");
+}
+
+void
+__builtin_nested_func_ptr_deleted (void)
+{
+  printf ("GCC: Generating a nested function pointer\n");
+}
