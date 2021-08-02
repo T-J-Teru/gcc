@@ -30,6 +30,8 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #include "unwind.h"
 #define NO_SIZE_OF_ENCODED_VALUE
 #include "unwind-pe.h"
+#include <sys/mman.h>
+#include <stdint.h>
 
 typedef struct
 {
@@ -246,13 +248,119 @@ __gcc_personality_seh0 (PEXCEPTION_RECORD ms_exc, void *this_frame,
 #endif /* SEH */
 
 
-extern void __builtin_nested_func_ptr_created (void);
+extern void __builtin_nested_func_ptr_created (void *sp, void *chain, void *func);
 extern void __builtin_nested_func_ptr_deleted (void);
 
-void
-__builtin_nested_func_ptr_created (void)
+struct tramps_ctrl_data
 {
+  void *start_of_first_page;
+  void *current_ptr;
+};
+
+static _Thread_local struct tramps_ctrl_data *tramps_ctrl = NULL;
+
+static struct tramps_ctrl_data *
+tramps_init_ctrl_data (void)
+{
+  int page_size;
+
+  /* TODO: We are leaking memory on failure here.  */
+
+  struct tramps_ctrl_data *p = malloc (sizeof (struct tramps_ctrl_data));
+  if (p == NULL)
+    return NULL;
+  memset (p, 0, sizeof (struct tramps_ctrl_data));
+
+  /* Allocate the first page.  */
+  page_size = getpagesize ();
+  p->start_of_first_page = mmap (0, page_size, PROT_WRITE | PROT_EXEC,
+				 MAP_ANON | MAP_PRIVATE, 0, 0);
+  if (p->start_of_first_page == MAP_FAILED)
+    return NULL;
+
+  p->current_ptr = p->start_of_first_page;
+
+  return p;
+}
+
+static void
+write_byte (uintptr_t addr, int val)
+{
+  unsigned char *ptr = (unsigned char *) addr;
+  *ptr = (val & 0xff);
+}
+
+
+void
+__builtin_nested_func_ptr_created (void *sp, void *chain, void *func, void **dst)
+{
+  uintptr_t ptr, addr;
+
+  if (tramps_ctrl == NULL)
+    tramps_ctrl = tramps_init_ctrl_data ();
+  if (tramps_ctrl == NULL)
+    abort ();	/* TODO: Something better?  */
+
+  /* TODO: Checks for the page being exhausted, etc.  */
+
+  /* 1. Generate code for the trampoline, filling in those bits as required from
+     the data passed into this function.  */
+  ptr = (uintptr_t) tramps_ctrl->current_ptr;
+  write_byte (ptr++, 0x41);
+  write_byte (ptr++, 0xbb);
+  addr = (uintptr_t) func;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+
+  write_byte (ptr++, 0x49);
+  write_byte (ptr++, 0xba);
+  addr = (uintptr_t) chain;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+  write_byte (ptr++, (addr & 0xff));
+  addr >>= 8;
+
+  write_byte (ptr++, 0x49);
+  write_byte (ptr++, 0xff);
+  write_byte (ptr++, 0xe3);
+
+  write_byte (ptr++, 0x90);
+  write_byte (ptr++, 0x90);
+  write_byte (ptr++, 0x90);
+  write_byte (ptr++, 0x90);
+  write_byte (ptr++, 0x90);
+
+  /* 2. Write out the information into a header block so we can understand what
+     this trampoline represents.  */
+
+  /* 3. flush the i-cache.  */
+  __builtin___clear_cache (tramps_ctrl->current_ptr, tramps_ctrl->current_ptr + 3);
+
+  /* 4. Return a pointer to the new trampoline.  */
+  *dst = tramps_ctrl->current_ptr;
+
   printf ("GCC: Generating a nested function pointer\n");
+  printf ("     sp = %p, chain = %p, func = %p, dst = %p\n", sp, chain, func, dst);
+  printf ("     ctrl = %p\n", tramps_ctrl);
+  printf ("     tramp = %p\n", tramps_ctrl->current_ptr);
 }
 
 void

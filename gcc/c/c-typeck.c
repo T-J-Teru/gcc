@@ -1948,7 +1948,27 @@ function_to_pointer_conversion (location_t loc, tree exp)
   if (TREE_NO_WARNING (orig_exp))
     TREE_NO_WARNING (exp) = 1;
 
-  return build_unary_op (loc, ADDR_EXPR, exp, false);
+  tree r = build_unary_op (loc, ADDR_EXPR, exp, false);
+
+  if (TREE_CODE(r) == ADDR_EXPR && DECL_STATIC_CHAIN (exp))
+    {
+      fprintf (stderr, "APB: In C frontend, take the address of a nested function.\n");
+
+#if 0
+      vec<tree, va_gc> *v;
+      vec_alloc (v, 0);
+
+      tree id = get_identifier ("xxx");
+      tree func = lookup_name (id);
+
+      tree cleanup = c_build_function_call_vec (loc, vNULL, func, v, NULL);
+      push_cleanup (/* for its location only */ exp,
+		    cleanup,
+		    false);
+#endif
+    }
+
+  return r;
 }
 
 /* Mark EXP as read, not just set, for set but not used -Wunused
@@ -3215,6 +3235,10 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
   else
     result = build_call_array_loc (loc, TREE_TYPE (fntype),
 				   function, nargs, argarray);
+
+  if (TREE_CODE (result) == CALL_EXPR)
+    fprintf (stderr, "APB: In C frontend, build function call vector\n");
+
   /* If -Wnonnull warning has been diagnosed, avoid diagnosing it again
      later.  */
   if (warned_p && TREE_CODE (result) == CALL_EXPR)

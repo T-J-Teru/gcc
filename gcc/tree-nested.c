@@ -608,6 +608,9 @@ get_trampoline_type (struct nesting_info *info)
   unsigned align, size;
   tree t;
 
+  /* APB: Change type of trampoline field.  */
+  return ptr_type_node;
+
   if (trampoline_type)
     return trampoline_type;
 
@@ -3473,14 +3476,35 @@ finalize_nesting_tree_1 (struct nesting_info *root)
 	  if (!field)
 	    continue;
 
-	  x = builtin_decl_implicit (BUILT_IN_INIT_TRAMPOLINE);
-	  stmt = build_init_call_stmt (root, i->context, field, x);
-	  gimple_seq_add_stmt (&stmt_list, stmt);
+	  x = builtin_decl_implicit (BUILT_IN_FRAME_ADDRESS);
+	  gcall *gg = gimple_build_call (x, 1, build_int_cst (integer_type_node, 0));
+	  gimple_stmt_iterator gsi = gsi_last (stmt_list);
+	  tree tmp = init_tmp_var_with_call (root, &gsi, gg);
 
 	  /* ... */
+	  tree arg1, arg2, arg3, arg4;
+
+	  gcc_assert (DECL_STATIC_CHAIN (i->context));
+	  arg1 = tmp;
+	  arg2 = build_addr (root->frame_decl);
+	  arg3 = build_addr (i->context);
+
+	  x = build3 (COMPONENT_REF, TREE_TYPE (field),
+		      root->frame_decl, field, NULL_TREE);
+	  arg4 = build_addr (x);
+
 	  x = builtin_decl_implicit (BUILT_IN_NESTED_PTR_CREATED);
-	  stmt = gimple_build_call (x, 0);
+	  stmt = gimple_build_call (x, 4, arg1, arg2, arg3, arg4);
 	  gimple_seq_add_stmt (&stmt_list, stmt);
+
+	  if (getenv ("APB_DO_ORIG") != NULL)
+	    {
+	      /* Original code to initialise the trampoline.  */
+	      x = builtin_decl_implicit (BUILT_IN_INIT_TRAMPOLINE);
+	      stmt = build_init_call_stmt (root, i->context, field, x);
+	      gimple_seq_add_stmt (&stmt_list, stmt);
+	    }
+
 
 	  if (getenv ("APB_DO_DELETE") != NULL)
 	    {
