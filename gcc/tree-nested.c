@@ -2709,6 +2709,8 @@ convert_nl_goto_receiver (gimple_stmt_iterator *gsi, bool *handled_ops_p,
 static tree
 convert_tramp_reference_op (tree *tp, int *walk_subtrees, void *data)
 {
+  fprintf (stderr, "APB: convert_tramp_reference_op\n");
+
   struct walk_stmt_info *wi = (struct walk_stmt_info *) data;
   struct nesting_info *const info = (struct nesting_info *) wi->info, *i;
   tree t = *tp, decl, target_context, x, builtin;
@@ -2758,7 +2760,7 @@ convert_tramp_reference_op (tree *tp, int *walk_subtrees, void *data)
 
       /* Compute the address of the field holding the trampoline.  */
       x = get_frame_field (info, target_context, x, &wi->gsi);
-      x = build_addr (x);
+      //x = build_addr (x);
       x = gsi_gimplify_val (info, x, &wi->gsi);
 
       /* Do machine-specific ugliness.  Normally this will involve
@@ -3345,6 +3347,7 @@ build_init_call_stmt (struct nesting_info *info, tree decl, tree field,
 static void
 finalize_nesting_tree_1 (struct nesting_info *root)
 {
+  gimple_seq cleanup_list = NULL;
   gimple_seq stmt_list = NULL;
   gimple *stmt;
   tree context = root->context;
@@ -3482,7 +3485,7 @@ finalize_nesting_tree_1 (struct nesting_info *root)
 	  tree tmp = init_tmp_var_with_call (root, &gsi, gg);
 
 	  /* ... */
-	  tree arg1, arg2, arg3, arg4;
+	  tree arg1, arg2, arg3, arg4, arg5;
 
 	  gcc_assert (DECL_STATIC_CHAIN (i->context));
 	  arg1 = tmp;
@@ -3496,6 +3499,10 @@ finalize_nesting_tree_1 (struct nesting_info *root)
 	  x = builtin_decl_implicit (BUILT_IN_NESTED_PTR_CREATED);
 	  stmt = gimple_build_call (x, 4, arg1, arg2, arg3, arg4);
 	  gimple_seq_add_stmt (&stmt_list, stmt);
+
+	  x = builtin_decl_implicit (BUILT_IN_NESTED_PTR_DELETED);
+	  stmt = gimple_build_call (x, 4, arg1, arg2, arg3, arg4);
+	  gimple_seq_add_stmt (&cleanup_list, stmt);
 
 	  if (getenv ("APB_DO_ORIG") != NULL)
 	    {
@@ -3537,11 +3544,30 @@ finalize_nesting_tree_1 (struct nesting_info *root)
   /* If we created initialization statements, insert them.  */
   if (stmt_list)
     {
+#if 1
+      gbind *bind;
+      annotate_all_with_location (stmt_list, DECL_SOURCE_LOCATION (context));
+      annotate_all_with_location (cleanup_list, DECL_SOURCE_LOCATION (context));
+      bind = gimple_seq_first_stmt_as_a_bind (gimple_body (context));
+      gimple_seq_add_seq (&stmt_list, gimple_bind_body (bind));
+
+      gimple_seq xxx_list = NULL;
+      /* We Maybe shouldn't be creating this try/finally if -fno-exceptions is
+	 in use.  If this is the case, then maybe we should, instead, be
+	 inserting the cleanup code onto every path out of this function?  Not
+	 yet figured out how we would do this.  */
+      gtry *t = gimple_build_try (stmt_list, cleanup_list, GIMPLE_TRY_FINALLY);
+      gimple_seq_add_stmt (&xxx_list, t);
+
+      gimple_bind_set_body (bind, xxx_list);
+#else
+      /* The OLD code.  */
       gbind *bind;
       annotate_all_with_location (stmt_list, DECL_SOURCE_LOCATION (context));
       bind = gimple_seq_first_stmt_as_a_bind (gimple_body (context));
       gimple_seq_add_seq (&stmt_list, gimple_bind_body (bind));
       gimple_bind_set_body (bind, stmt_list);
+#endif
     }
 
   /* If a chain_decl was created, then it needs to be registered with

@@ -248,8 +248,8 @@ __gcc_personality_seh0 (PEXCEPTION_RECORD ms_exc, void *this_frame,
 #endif /* SEH */
 
 
-extern void __builtin_nested_func_ptr_created (void *sp, void *chain, void *func);
-extern void __builtin_nested_func_ptr_deleted (void);
+extern void __builtin_nested_func_ptr_created (void *sp, void *chain, void *func, void **dst);
+extern void __builtin_nested_func_ptr_deleted (void *sp, void *chain, void *func, void **dst);
 
 struct tramps_ctrl_data
 {
@@ -352,7 +352,7 @@ __builtin_nested_func_ptr_created (void *sp, void *chain, void *func, void **dst
      this trampoline represents.  */
 
   /* 3. flush the i-cache.  */
-  __builtin___clear_cache (tramps_ctrl->current_ptr, tramps_ctrl->current_ptr + 3);
+  __builtin___clear_cache (tramps_ctrl->current_ptr, ptr);
 
   /* 4. Return a pointer to the new trampoline.  */
   *dst = tramps_ctrl->current_ptr;
@@ -364,7 +364,10 @@ __builtin_nested_func_ptr_created (void *sp, void *chain, void *func, void **dst
 }
 
 void
-__builtin_nested_func_ptr_deleted (void)
+__builtin_nested_func_ptr_deleted (void *sp, void *chain, void *func, void **dst)
 {
-  printf ("GCC: Generating a nested function pointer\n");
+  void *tramp = *dst;
+  printf ("GCC: Deleting a nested function pointer\n");
+  printf ("     sp = %p, chain = %p, func = %p, tramp = %p\n", sp, chain, func, tramp);
+  printf ("     ctrl = %p\n", tramps_ctrl);
 }
