@@ -290,18 +290,34 @@ write_byte (uintptr_t addr, int val)
   *ptr = (val & 0xff);
 }
 
+/* Size of a single trampoline entry, in bytes.  */
+#define SIZE_OF_TRAMPOLINE 64
 
 void
 __builtin_nested_func_ptr_created (void *sp, void *chain, void *func, void **dst)
 {
-  uintptr_t ptr, addr;
+  uintptr_t ptr, addr, start, end;
+  int page_size;
 
   if (tramps_ctrl == NULL)
     tramps_ctrl = tramps_init_ctrl_data ();
   if (tramps_ctrl == NULL)
     abort ();	/* TODO: Something better?  */
 
-  /* TODO: Checks for the page being exhausted, etc.  */
+  /* Figure out the start, and then the end, of the page currently being written
+     too.  */
+  page_size = getpagesize ();
+  ptr = (uintptr_t) tramps_ctrl->current_ptr;
+  start = ptr & ~(page_size - 1);
+  end = start + page_size;
+  printf ("Current trampoline page, start = %p, end = %p\n",
+	  ((void *) start), ((void *) end));
+
+  /* TODO: Eventually, this check needs to trigger the allocation of another
+     page of memory, and then somehow link that new page in with the previous
+     pages.  */
+  if (ptr + SIZE_OF_TRAMPOLINE >= end)
+    abort ();
 
   /* 1. Generate code for the trampoline, filling in those bits as required from
      the data passed into this function.  */
@@ -346,16 +362,24 @@ __builtin_nested_func_ptr_created (void *sp, void *chain, void *func, void **dst
   write_byte (ptr++, 0x90);
   write_byte (ptr++, 0x90);
   write_byte (ptr++, 0x90);
-  write_byte (ptr++, 0x90);
+  write_byte (ptr++, 0x90);	/* 24-bytes.  */
 
-  /* 2. Write out the information into a header block so we can understand what
-     this trampoline represents.  */
-
-  /* 3. flush the i-cache.  */
+  /* 2. Flush the i-cache for the code we just wrote.  We're going to also write
+     some data onto this page, but we don't need to flush the icache for
+     that.*/
   __builtin___clear_cache (tramps_ctrl->current_ptr, ptr);
+
+  /* 3. Write out the information into a header block so we can understand what
+     this trampoline represents.  */
+  ptr += 24;	/* Leave a gap.  */
+  *((void **) ptr) = (void *) chain;
+  ptr += 8;
+  *((void **) ptr) = (void *) func;
+  ptr += 8;
 
   /* 4. Return a pointer to the new trampoline.  */
   *dst = tramps_ctrl->current_ptr;
+  tramps_ctrl->current_ptr = ptr;
 
   printf ("GCC: Generating a nested function pointer\n");
   printf ("     sp = %p, chain = %p, func = %p, dst = %p\n", sp, chain, func, dst);
@@ -366,6 +390,23 @@ __builtin_nested_func_ptr_created (void *sp, void *chain, void *func, void **dst
 void
 __builtin_nested_func_ptr_deleted (void *sp, void *chain, void *func, void **dst)
 {
+  uintptr_t ptr, addr, start, end;
+  int page_size;
+
+  /* If the control structure is not initialised then surely there should be no
+     trampolines allocated.  So, why did we end up here at all?  */
+  if (tramps_ctrl == NULL)
+    abort ();		/* Maybe we should do something better.  */
+
+  /* Figure out the start, and then the end, of the page currently being written
+     too.  */
+  page_size = getpagesize ();
+  ptr = (uintptr_t) tramps_ctrl->current_ptr;
+  start = ptr & ~(page_size - 1);
+  end = start + page_size;
+  printf ("Current trampoline page, start = %p, end = %p\n",
+	  ((void *) start), ((void *) end));
+
   void *tramp = *dst;
   printf ("GCC: Deleting a nested function pointer\n");
   printf ("     sp = %p, chain = %p, func = %p, tramp = %p\n", sp, chain, func, tramp);
