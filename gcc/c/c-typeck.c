@@ -1952,7 +1952,8 @@ function_to_pointer_conversion (location_t loc, tree exp)
 
   if (TREE_CODE(r) == ADDR_EXPR && DECL_STATIC_CHAIN (exp))
     {
-      fprintf (stderr, "APB: In C frontend, take the address of a nested function.\n");
+      if (getenv ("APB_DEBUG") != NULL)
+	fprintf (stderr, "APB: In C frontend, take the address of a nested function.\n");
 
 #if 0
       vec<tree, va_gc> *v;
@@ -3237,7 +3238,10 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
 				   function, nargs, argarray);
 
   if (TREE_CODE (result) == CALL_EXPR)
-    fprintf (stderr, "APB: In C frontend, build function call vector\n");
+    {
+      if (getenv ("APB_DEBUG") != NULL)
+	fprintf (stderr, "APB: In C frontend, build function call vector\n");
+    }
 
   /* If -Wnonnull warning has been diagnosed, avoid diagnosing it again
      later.  */

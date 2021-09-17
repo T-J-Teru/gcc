@@ -2709,7 +2709,8 @@ convert_nl_goto_receiver (gimple_stmt_iterator *gsi, bool *handled_ops_p,
 static tree
 convert_tramp_reference_op (tree *tp, int *walk_subtrees, void *data)
 {
-  fprintf (stderr, "APB: convert_tramp_reference_op\n");
+  if (getenv ("APB_DEBUG") != NULL)
+    fprintf (stderr, "APB: convert_tramp_reference_op\n");
 
   struct walk_stmt_info *wi = (struct walk_stmt_info *) data;
   struct nesting_info *const info = (struct nesting_info *) wi->info, *i;
@@ -3552,12 +3553,18 @@ finalize_nesting_tree_1 (struct nesting_info *root)
       gimple_seq_add_seq (&stmt_list, gimple_bind_body (bind));
 
       gimple_seq xxx_list = NULL;
-      /* We Maybe shouldn't be creating this try/finally if -fno-exceptions is
-	 in use.  If this is the case, then maybe we should, instead, be
-	 inserting the cleanup code onto every path out of this function?  Not
-	 yet figured out how we would do this.  */
-      gtry *t = gimple_build_try (stmt_list, cleanup_list, GIMPLE_TRY_FINALLY);
-      gimple_seq_add_stmt (&xxx_list, t);
+
+      if (cleanup_list != NULL)
+	{
+	  /* We Maybe shouldn't be creating this try/finally if -fno-exceptions is
+	     in use.  If this is the case, then maybe we should, instead, be
+	     inserting the cleanup code onto every path out of this function?  Not
+	     yet figured out how we would do this.  */
+	  gtry *t = gimple_build_try (stmt_list, cleanup_list, GIMPLE_TRY_FINALLY);
+	  gimple_seq_add_stmt (&xxx_list, t);
+	}
+      else
+	xxx_list = stmt_list;
 
       gimple_bind_set_body (bind, xxx_list);
 #else
