@@ -2849,9 +2849,17 @@ target_tools="target-rda"
 ## We assign ${configdirs} this way to remove all embedded newlines.  This
 ## is important because configure will choke if they ever get through.
 ## ${configdirs} is directories we build using the host tools.
-## ${target_configdirs} is directories we build using the target tools.
+##
+## ${target_configdirs} is directories we build using the target
+## tools, these are only needed when working in the gcc tree.  This
+## file is also reused in the binutils-gdb tree, where building any
+## target stuff doesn't make sense.
 configdirs=`echo ${host_libs} ${host_tools}`
-target_configdirs=`echo ${target_libraries} ${target_tools}`
+if test -d ${srcdir}/gcc; then
+  target_configdirs=`echo ${target_libraries} ${target_tools}`
+else
+  target_configdirs=""
+fi
 build_configdirs=`echo ${build_libs} ${build_tools}`
 
 

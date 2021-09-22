@@ -1,3 +1,9 @@
+2021-09-22  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* configure: Regenerate.
+	* configure.ac (target_configdirs): Only set this when building
+	within the gcc repository.
+
 2021-09-01  YunQiang Su  <syq@debian.org>
 
 	* MAINTAINERS: Add myself for write after approval.
