@@ -1948,9 +1948,7 @@ function_to_pointer_conversion (location_t loc, tree exp)
   if (TREE_NO_WARNING (orig_exp))
     TREE_NO_WARNING (exp) = 1;
 
-  tree r = build_unary_op (loc, ADDR_EXPR, exp, false);
-
-  return r;
+  return build_unary_op (loc, ADDR_EXPR, exp, false);
 }
 
 /* Mark EXP as read, not just set, for set but not used -Wunused
@@ -3217,13 +3215,6 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
   else
     result = build_call_array_loc (loc, TREE_TYPE (fntype),
 				   function, nargs, argarray);
-
-  if (TREE_CODE (result) == CALL_EXPR)
-    {
-      if (getenv ("APB_DEBUG") != NULL)
-	fprintf (stderr, "APB: In C frontend, build function call vector\n");
-    }
-
   /* If -Wnonnull warning has been diagnosed, avoid diagnosing it again
      later.  */
   if (warned_p && TREE_CODE (result) == CALL_EXPR)
