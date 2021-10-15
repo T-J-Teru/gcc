@@ -47,6 +47,10 @@
 #include "symbol-summary.h"
 #include "symtab-thunks.h"
 
+/* APB: This is just a temporary hack.  This global flag controls whether we are
+   creating trampolines in the off-stack memory regions or not.  */
+static bool off_stack_trampolines = true;
+
 /* Summary of nested functions.  */
 static function_summary <nested_function_info *>
    *nested_function_sum = NULL;
@@ -608,11 +612,16 @@ get_trampoline_type (struct nesting_info *info)
   unsigned align, size;
   tree t;
 
-  /* APB: Change type of trampoline field.  */
-  return ptr_type_node;
-
   if (trampoline_type)
     return trampoline_type;
+
+  /* When trampolines are created off-stack then the only thing we need in the
+     local frame is a single pointer.  */
+  if (off_stack_trampolines)
+    {
+      trampoline_type = build_pointer_type (void_type_node);
+      return trampoline_type;
+    }
 
   align = TRAMPOLINE_ALIGNMENT;
   size = TRAMPOLINE_SIZE;
@@ -2709,9 +2718,6 @@ convert_nl_goto_receiver (gimple_stmt_iterator *gsi, bool *handled_ops_p,
 static tree
 convert_tramp_reference_op (tree *tp, int *walk_subtrees, void *data)
 {
-  if (getenv ("APB_DEBUG") != NULL)
-    fprintf (stderr, "APB: convert_tramp_reference_op\n");
-
   struct walk_stmt_info *wi = (struct walk_stmt_info *) data;
   struct nesting_info *const info = (struct nesting_info *) wi->info, *i;
   tree t = *tp, decl, target_context, x, builtin;
@@ -2761,17 +2767,27 @@ convert_tramp_reference_op (tree *tp, int *walk_subtrees, void *data)
 
       /* Compute the address of the field holding the trampoline.  */
       x = get_frame_field (info, target_context, x, &wi->gsi);
-      //x = build_addr (x);
-      x = gsi_gimplify_val (info, x, &wi->gsi);
 
-      /* Do machine-specific ugliness.  Normally this will involve
-	 computing extra alignment, but it can really be anything.  */
-      if (descr)
-	builtin = builtin_decl_implicit (BUILT_IN_ADJUST_DESCRIPTOR);
+      /* APB: We don't need to do the adjustment calls when using off-stack
+	 trampolines, any such adjustment will be done when the off-stack
+	 trampoline is created.  */
+      if (off_stack_trampolines)
+	x = gsi_gimplify_val (info, x, &wi->gsi);
       else
-	builtin = builtin_decl_implicit (BUILT_IN_ADJUST_TRAMPOLINE);
-      call = gimple_build_call (builtin, 1, x);
-      x = init_tmp_var_with_call (info, &wi->gsi, call);
+	{
+	  x = build_addr (x);
+
+	  x = gsi_gimplify_val (info, x, &wi->gsi);
+
+	  /* Do machine-specific ugliness.  Normally this will involve
+	     computing extra alignment, but it can really be anything.  */
+	  if (descr)
+	    builtin = builtin_decl_implicit (BUILT_IN_ADJUST_DESCRIPTOR);
+	  else
+	    builtin = builtin_decl_implicit (BUILT_IN_ADJUST_TRAMPOLINE);
+	  call = gimple_build_call (builtin, 1, x);
+	  x = init_tmp_var_with_call (info, &wi->gsi, call);
+	}
 
       /* Cast back to the proper function type.  */
       x = build1 (NOP_EXPR, TREE_TYPE (t), x);
@@ -3480,45 +3496,54 @@ finalize_nesting_tree_1 (struct nesting_info *root)
 	  if (!field)
 	    continue;
 
-	  x = builtin_decl_implicit (BUILT_IN_FRAME_ADDRESS);
-	  gcall *gg = gimple_build_call (x, 1, build_int_cst (integer_type_node, 0));
-	  gimple_stmt_iterator gsi = gsi_last (stmt_list);
-	  tree tmp = init_tmp_var_with_call (root, &gsi, gg);
-
-	  /* ... */
-	  tree arg1, arg2, arg3, arg4, arg5;
-
-	  gcc_assert (DECL_STATIC_CHAIN (i->context));
-	  arg1 = tmp;
-	  arg2 = build_addr (root->frame_decl);
-	  arg3 = build_addr (i->context);
-
-	  x = build3 (COMPONENT_REF, TREE_TYPE (field),
-		      root->frame_decl, field, NULL_TREE);
-	  arg4 = build_addr (x);
-
-	  x = builtin_decl_implicit (BUILT_IN_NESTED_PTR_CREATED);
-	  stmt = gimple_build_call (x, 4, arg1, arg2, arg3, arg4);
-	  gimple_seq_add_stmt (&stmt_list, stmt);
-
-	  x = builtin_decl_implicit (BUILT_IN_NESTED_PTR_DELETED);
-	  stmt = gimple_build_call (x, 4, arg1, arg2, arg3, arg4);
-	  gimple_seq_add_stmt (&cleanup_list, stmt);
-
-	  if (getenv ("APB_DO_ORIG") != NULL)
+	  if (off_stack_trampolines)
 	    {
-	      /* Original code to initialise the trampoline.  */
+	      /* Initialise the off-stack trampolines using builtin calls.  */
+	      x = builtin_decl_implicit (BUILT_IN_FRAME_ADDRESS);
+	      gcall *gg = gimple_build_call (x, 1, build_int_cst (integer_type_node, 0));
+	      gimple_stmt_iterator gsi = gsi_last (stmt_list);
+	      tree tmp = init_tmp_var_with_call (root, &gsi, gg);
+
+	      /* We pass a whole bunch of arguments to the builtin function that
+		 creates the off-stack trampoline, these are
+		 1. Stack pointer,
+		 2. The nested function chain value (that must be passed to the
+		 nested function so it can find the function arguments).
+		 3. A pointer to the nested function implementation,
+		 4. The address in the local stack frame where we should write
+		 the address of the trampoline.
+
+		 When this code was originally written I just kind of threw
+		 everything at the builtin, figuring I'd work out what was
+		 actually needed later, I think, the stack pointer could
+		 certainly be dropped, arguments #2 and #4 are based off the
+		 stack pointer anyway, so #1 doesn't seem to add much value.  */
+	      tree arg1, arg2, arg3, arg4;
+
+	      gcc_assert (DECL_STATIC_CHAIN (i->context));
+	      arg1 = tmp;
+	      arg2 = build_addr (root->frame_decl);
+	      arg3 = build_addr (i->context);
+
+	      x = build3 (COMPONENT_REF, TREE_TYPE (field),
+			  root->frame_decl, field, NULL_TREE);
+	      arg4 = build_addr (x);
+
+	      x = builtin_decl_implicit (BUILT_IN_NESTED_PTR_CREATED);
+	      stmt = gimple_build_call (x, 4, arg1, arg2, arg3, arg4);
+	      gimple_seq_add_stmt (&stmt_list, stmt);
+
+	      /* This call to delete the nested function trampoline is added to
+		 the cleanup list, and called when we exit the current scope.  */
+	      x = builtin_decl_implicit (BUILT_IN_NESTED_PTR_DELETED);
+	      stmt = gimple_build_call (x, 4, arg1, arg2, arg3, arg4);
+	      gimple_seq_add_stmt (&cleanup_list, stmt);
+	    }
+	  else
+	    {
+	      /* Original code to initialise the on stack trampoline.  */
 	      x = builtin_decl_implicit (BUILT_IN_INIT_TRAMPOLINE);
 	      stmt = build_init_call_stmt (root, i->context, field, x);
-	      gimple_seq_add_stmt (&stmt_list, stmt);
-	    }
-
-
-	  if (getenv ("APB_DO_DELETE") != NULL)
-	    {
-	      x = builtin_decl_implicit (BUILT_IN_NESTED_PTR_DELETED);
-	      stmt = gimple_build_call (x, 0);
-	      stmt = gimple_build_wce (stmt);
 	      gimple_seq_add_stmt (&stmt_list, stmt);
 	    }
 	}
@@ -3545,36 +3570,40 @@ finalize_nesting_tree_1 (struct nesting_info *root)
   /* If we created initialization statements, insert them.  */
   if (stmt_list)
     {
-#if 1
-      gbind *bind;
-      annotate_all_with_location (stmt_list, DECL_SOURCE_LOCATION (context));
-      annotate_all_with_location (cleanup_list, DECL_SOURCE_LOCATION (context));
-      bind = gimple_seq_first_stmt_as_a_bind (gimple_body (context));
-      gimple_seq_add_seq (&stmt_list, gimple_bind_body (bind));
-
-      gimple_seq xxx_list = NULL;
-
-      if (cleanup_list != NULL)
+      if (off_stack_trampolines)
 	{
-	  /* We Maybe shouldn't be creating this try/finally if -fno-exceptions is
-	     in use.  If this is the case, then maybe we should, instead, be
-	     inserting the cleanup code onto every path out of this function?  Not
-	     yet figured out how we would do this.  */
-	  gtry *t = gimple_build_try (stmt_list, cleanup_list, GIMPLE_TRY_FINALLY);
-	  gimple_seq_add_stmt (&xxx_list, t);
+	  /* Handle the new, off stack trampolines.  */
+	  gbind *bind;
+	  annotate_all_with_location (stmt_list, DECL_SOURCE_LOCATION (context));
+	  annotate_all_with_location (cleanup_list, DECL_SOURCE_LOCATION (context));
+	  bind = gimple_seq_first_stmt_as_a_bind (gimple_body (context));
+	  gimple_seq_add_seq (&stmt_list, gimple_bind_body (bind));
+
+	  gimple_seq xxx_list = NULL;
+
+	  if (cleanup_list != NULL)
+	    {
+	      /* We Maybe shouldn't be creating this try/finally if -fno-exceptions is
+		 in use.  If this is the case, then maybe we should, instead, be
+		 inserting the cleanup code onto every path out of this function?  Not
+		 yet figured out how we would do this.  */
+	      gtry *t = gimple_build_try (stmt_list, cleanup_list, GIMPLE_TRY_FINALLY);
+	      gimple_seq_add_stmt (&xxx_list, t);
+	    }
+	  else
+	    xxx_list = stmt_list;
+
+	  gimple_bind_set_body (bind, xxx_list);
 	}
       else
-	xxx_list = stmt_list;
-
-      gimple_bind_set_body (bind, xxx_list);
-#else
-      /* The OLD code.  */
-      gbind *bind;
-      annotate_all_with_location (stmt_list, DECL_SOURCE_LOCATION (context));
-      bind = gimple_seq_first_stmt_as_a_bind (gimple_body (context));
-      gimple_seq_add_seq (&stmt_list, gimple_bind_body (bind));
-      gimple_bind_set_body (bind, stmt_list);
-#endif
+	{
+	  /* The traditional, on stack trampolines.  */
+	  gbind *bind;
+	  annotate_all_with_location (stmt_list, DECL_SOURCE_LOCATION (context));
+	  bind = gimple_seq_first_stmt_as_a_bind (gimple_body (context));
+	  gimple_seq_add_seq (&stmt_list, gimple_bind_body (bind));
+	  gimple_bind_set_body (bind, stmt_list);
+	}
     }
 
   /* If a chain_decl was created, then it needs to be registered with
